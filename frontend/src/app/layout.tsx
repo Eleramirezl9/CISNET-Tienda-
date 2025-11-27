@@ -2,12 +2,16 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: 'Tienda E-commerce - Guatemala',
-  description: 'E-commerce enterprise-grade construido con Next.js 14, TypeScript y NestJS',
-  keywords: ['ecommerce', 'tienda online', 'guatemala', 'compras'],
+  title: 'CISNET - Tu plataforma de software especializada',
+  description: 'Descarga las mejores herramientas de desarrollo, productividad y creatividad',
+  keywords: ['software', 'herramientas', 'desarrollo', 'productividad'],
 };
 
 export default function RootLayout({
@@ -16,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
-      <body className={inter.className}>
+    <html lang="es" className="antialiased">
+      <body className={`${inter.variable} font-sans bg-white text-zinc-900`}>
         {children}
       </body>
     </html>

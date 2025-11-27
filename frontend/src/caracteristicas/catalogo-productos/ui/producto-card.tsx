@@ -1,6 +1,6 @@
 /**
  * ProductoCard - Componente UI
- * Tarjeta de producto con imagen, título, precio y acciones
+ * Tarjeta de producto minimalista premium con micro-interacciones
  */
 
 'use client';
@@ -28,85 +28,87 @@ export function ProductoCard({ producto, className, onAgregarCarrito }: Producto
   return (
     <article
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-lg',
-        sinStock && 'opacity-60',
+        'group relative flex flex-col overflow-hidden bg-white transition-all duration-300',
+        sinStock && 'opacity-70',
         className
       )}
     >
-      {/* Badge de descuento */}
+      {/* Badge de descuento - Elegante */}
       {tieneDescuento && !sinStock && (
-        <div className="absolute left-2 top-2 z-10 rounded-full bg-red-500 px-2 py-1 text-xs font-bold text-white">
+        <div className="absolute top-6 left-6 z-10 inline-flex items-center gap-1 px-3 py-1.5 bg-zinc-900 text-white text-xs font-semibold rounded-lg">
           -{porcentajeDescuento}%
         </div>
       )}
 
-      {/* Badge sin stock */}
+      {/* Badge sin stock - Elegante */}
       {sinStock && (
-        <div className="absolute left-2 top-2 z-10 rounded-full bg-gray-800 px-2 py-1 text-xs font-bold text-white">
+        <div className="absolute top-6 left-6 z-10 inline-flex items-center gap-1 px-3 py-1.5 bg-zinc-600 text-white text-xs font-semibold rounded-lg">
           Agotado
         </div>
       )}
 
-      {/* Imagen del producto */}
-      <Link href={`/productos/${producto.slug}`} className="relative aspect-square overflow-hidden">
+      {/* Imagen del producto - Con efecto sutil */}
+      <Link href={`/productos/${producto.slug}`} className="relative aspect-square overflow-hidden mb-8 bg-zinc-100">
         <Image
           src={producto.imagenPrincipal}
           alt={producto.nombre}
           fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
+        {/* Overlay sutil al hover */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
       </Link>
 
-      {/* Contenido */}
-      <div className="flex flex-1 flex-col p-4">
-        {/* Categoría */}
-        <p className="mb-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
+      {/* Contenido - Espaciado generoso */}
+      <div className="flex flex-1 flex-col">
+        {/* Categoría - Uppercase discreto */}
+        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-3">
           {producto.categoria}
         </p>
 
-        {/* Título */}
+        {/* Título - Tipografía fuerte */}
         <Link href={`/productos/${producto.slug}`}>
-          <h3 className="mb-2 text-base font-semibold text-gray-900 line-clamp-2 hover:text-primary transition-colors">
+          <h3 className="text-lg font-bold text-zinc-900 leading-snug line-clamp-2 mb-4 group-hover:text-zinc-700 transition-colors duration-200">
             {producto.nombre}
           </h3>
         </Link>
 
-        {/* Descripción */}
-        <p className="mb-3 flex-1 text-sm text-gray-600 line-clamp-2">
+        {/* Descripción - Gris suave */}
+        <p className="text-sm text-zinc-600 line-clamp-2 mb-6 flex-1 font-light leading-relaxed">
           {producto.descripcion}
         </p>
 
-        {/* Precios */}
-        <div className="mb-3 flex items-baseline gap-2">
-          <span className="text-xl font-bold text-gray-900">
+        {/* Precios - Alineados a la izquierda */}
+        <div className="flex items-baseline gap-3 mb-6">
+          <span className="text-2xl font-bold text-zinc-900">
             {formatCurrency(producto.precio)}
           </span>
           {tieneDescuento && (
-            <span className="text-sm font-medium text-gray-500 line-through">
+            <span className="text-sm font-medium text-zinc-400 line-through">
               {formatCurrency(producto.precioAnterior!)}
             </span>
           )}
         </div>
 
-        {/* Botón de acción */}
+        {/* Botón de acción - Premium */}
         <button
           onClick={() => onAgregarCarrito?.(producto)}
           disabled={sinStock}
           className={cn(
-            'w-full rounded-md py-2 px-4 text-sm font-semibold transition-colors',
+            'w-full rounded-lg py-3 px-4 text-sm font-semibold transition-all duration-200 active:scale-95',
             sinStock
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95'
+              ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
+              : 'bg-zinc-900 text-white hover:bg-zinc-800 hover:shadow-md'
           )}
         >
           {sinStock ? 'Sin stock' : 'Agregar al carrito'}
         </button>
 
-        {/* Stock disponible */}
+        {/* Stock disponible - Alerta sutil */}
         {!sinStock && producto.stock < 5 && (
-          <p className="mt-2 text-xs text-amber-600 font-medium">
-            ¡Solo quedan {producto.stock} unidades!
+          <p className="mt-4 text-xs text-zinc-600 font-medium">
+            ⚠️ Solo quedan {producto.stock} {producto.stock === 1 ? 'unidad' : 'unidades'}
           </p>
         )}
       </div>
