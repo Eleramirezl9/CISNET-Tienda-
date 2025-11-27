@@ -1,0 +1,164 @@
+// Prisma Schema - Base de Datos E-commerce
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// MODELO: Producto
+// ============================================
+model Producto {
+  id               String   @id @default(uuid())
+  nombre           String   @db.VarChar(200)
+  descripcion      String   @db.Text
+  slug             String   @unique @db.VarChar(255)
+  precio           Decimal  @db.Decimal(10, 2)
+  precioAnterior   Decimal? @db.Decimal(10, 2)
+  stock            Int      @default(0)
+  imagenPrincipal  String   @db.VarChar(500)
+  imagenes         String[] @default([])
+  categoriaId      String
+  categoria        String   @db.VarChar(100)
+  etiquetas        String[] @default([])
+  caracteristicas  Json     @default("{}")
+  activo           Boolean  @default(true)
+  destacado        Boolean  @default(false)
+  fechaCreacion    DateTime @default(now()) @map("fecha_creacion")
+  fechaActualizacion DateTime @updatedAt @map("fecha_actualizacion")
+
+  // Relaciones
+  itemsPedido ItemPedido[]
+
+  @@index([categoriaId])
+  @@index([slug])
+  @@index([activo, destacado])
+  @@index([precio])
+  @@map("productos")
+}
+
+// ============================================
+// MODELO: Usuario
+// ============================================
+model Usuario {
+  id                String   @id @default(uuid())
+  email             String   @unique @db.VarChar(255)
+  password          String   @db.VarChar(255)
+  nombre            String   @db.VarChar(200)
+  apellido          String?  @db.VarChar(200)
+  telefono          String?  @db.VarChar(20)
+  rol               String   @default("cliente") @db.VarChar(50) // cliente, admin
+  activo            Boolean  @default(true)
+  emailVerificado   Boolean  @default(false) @map("email_verificado")
+  fechaCreacion     DateTime @default(now()) @map("fecha_creacion")
+  fechaActualizacion DateTime @updatedAt @map("fecha_actualizacion")
+
+  // Relaciones
+  pedidos     Pedido[]
+  direcciones Direccion[]
+
+  @@index([email])
+  @@map("usuarios")
+}
+
+// ============================================
+// MODELO: Dirección
+// ============================================
+model Direccion {
+  id              String   @id @default(uuid())
+  usuarioId       String   @map("usuario_id")
+  nombre          String   @db.VarChar(100) // "Casa", "Oficina"
+  direccionLinea1 String   @db.VarChar(255) @map("direccion_linea_1")
+  direccionLinea2 String?  @db.VarChar(255) @map("direccion_linea_2")
+  ciudad          String   @db.VarChar(100)
+  departamento    String   @db.VarChar(100)
+  codigoPostal    String?  @db.VarChar(20) @map("codigo_postal")
+  telefono        String   @db.VarChar(20)
+  predeterminada  Boolean  @default(false)
+  fechaCreacion   DateTime @default(now()) @map("fecha_creacion")
+
+  // Relaciones
+  usuario Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  pedidos Pedido[]
+
+  @@index([usuarioId])
+  @@map("direcciones")
+}
+
+// ============================================
+// MODELO: Pedido
+// ============================================
+model Pedido {
+  id                 String   @id @default(uuid())
+  usuarioId          String   @map("usuario_id")
+  direccionId        String   @map("direccion_id")
+  estado             String   @default("pendiente") @db.VarChar(50) // pendiente, confirmado, enviado, entregado, cancelado
+  subtotal           Decimal  @db.Decimal(10, 2)
+  impuestos          Decimal  @db.Decimal(10, 2)
+  envio              Decimal  @db.Decimal(10, 2)
+  total              Decimal  @db.Decimal(10, 2)
+  metodoPago         String   @db.VarChar(50) @map("metodo_pago") // recurrente, stripe, fri, cod
+  estadoPago         String   @default("pendiente") @db.VarChar(50) @map("estado_pago") // pendiente, pagado, fallido, reembolsado
+  notasCliente       String?  @db.Text @map("notas_cliente")
+  fechaCreacion      DateTime @default(now()) @map("fecha_creacion")
+  fechaActualizacion DateTime @updatedAt @map("fecha_actualizacion")
+
+  // Relaciones
+  usuario   Usuario      @relation(fields: [usuarioId], references: [id])
+  direccion Direccion    @relation(fields: [direccionId], references: [id])
+  items     ItemPedido[]
+  pago      Pago?
+
+  @@index([usuarioId])
+  @@index([estado])
+  @@index([fechaCreacion])
+  @@map("pedidos")
+}
+
+// ============================================
+// MODELO: Item de Pedido
+// ============================================
+model ItemPedido {
+  id          String  @id @default(uuid())
+  pedidoId    String  @map("pedido_id")
+  productoId  String  @map("producto_id")
+  cantidad    Int
+  precioUnitario Decimal @db.Decimal(10, 2) @map("precio_unitario")
+  subtotal    Decimal @db.Decimal(10, 2)
+
+  // Relaciones
+  pedido   Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  producto Producto @relation(fields: [productoId], references: [id])
+
+  @@index([pedidoId])
+  @@index([productoId])
+  @@map("items_pedido")
+}
+
+// ============================================
+// MODELO: Pago
+// ============================================
+model Pago {
+  id                   String   @id @default(uuid())
+  pedidoId             String   @unique @map("pedido_id")
+  metodoPago           String   @db.VarChar(50) @map("metodo_pago")
+  proveedor            String   @db.VarChar(50) // recurrente, stripe, fri
+  transaccionId        String?  @unique @db.VarChar(255) @map("transaccion_id")
+  estado               String   @db.VarChar(50) // pendiente, completado, fallido, reembolsado
+  monto                Decimal  @db.Decimal(10, 2)
+  moneda               String   @default("GTQ") @db.VarChar(3)
+  metadatos            Json?    @default("{}")
+  fechaCreacion        DateTime @default(now()) @map("fecha_creacion")
+  fechaActualizacion   DateTime @updatedAt @map("fecha_actualizacion")
+
+  // Relaciones
+  pedido Pedido @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+
+  @@index([transaccionId])
+  @@index([estado])
+  @@map("pagos")
+}

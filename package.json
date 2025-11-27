@@ -1,0 +1,40 @@
+{
+  "name": "tienda-ecommerce-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "E-commerce platform with Next.js frontend and NestJS backend",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter tienda-ecommerce run dev",
+    "dev:all": "pnpm run dev:backend & pnpm run dev:frontend",
+    "dev:backend": "pnpm --filter tienda-backend run start:dev",
+    "dev:frontend": "pnpm --filter tienda-ecommerce run dev",
+    "build": "pnpm --filter tienda-ecommerce run build && pnpm --filter tienda-backend run build",
+    "build:frontend": "pnpm --filter tienda-ecommerce run build",
+    "build:backend": "pnpm --filter tienda-backend run build",
+    "start": "pnpm --filter tienda-ecommerce run start",
+    "lint": "pnpm --filter tienda-ecommerce run lint && pnpm --filter tienda-backend run lint",
+    "type-check": "pnpm --filter tienda-ecommerce run type-check && pnpm --filter tienda-backend run type-check",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f postgres",
+    "docker:reset": "docker-compose down -v && docker-compose up -d",
+    "db:migrate": "pnpm --filter tienda-backend run prisma:migrate",
+    "db:push": "pnpm --filter tienda-backend run prisma:push",
+    "db:seed": "pnpm --filter tienda-backend run prisma:seed",
+    "db:studio": "pnpm --filter tienda-backend run prisma:studio",
+    "db:reset": "pnpm --filter tienda-backend run prisma:reset"
+  },
+  "keywords": [
+    "ecommerce",
+    "nextjs",
+    "nestjs",
+    "prisma",
+    "tailwind"
+  ],
+  "author": "",
+  "license": "MIT"
+}

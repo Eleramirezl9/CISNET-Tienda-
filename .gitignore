@@ -1,0 +1,119 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+# ✅ DO COMMIT pnpm-lock.yaml - It's required for reproducible installs
+.pnp
+.pnp.js
+
+# Environment variables (CRITICAL - Never commit)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.production.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+**/.env
+**/.env.local
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+.jest-cache/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*~
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker volumes and data (NEVER commit database data)
+docker-compose.override.yml
+.docker/
+postgres_data/
+pgadmin_data/
+
+# Secrets and credentials
+*.pem
+*.key
+*.cert
+*.crt
+secrets/
+credentials/
+
+# Cache
+.cache/
+.eslintcache
+.next/cache/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env.venv
+
+# Misc
+.vercel
+.local/
+.turbo/
+
+# IDE plugins
+.vscode-test
+
+# Documentation - Allow specific files, ignore drafts
+docs/*
+!docs/DOCKER_SETUP.md
+!docs/SECURITY.md
+!docs/QUICK_START.md
+!docs/.gitkeep
