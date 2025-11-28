@@ -1,6 +1,25 @@
+'use client';
+
 import Link from 'next/link';
+import { useAutenticacionRequerida } from '@/compartido/hooks/use-autenticacion-requerida';
 
 export default function CarritoPage() {
+  // Esta página requiere autenticación
+  // Si no está autenticado, será redirigido a /login?returnUrl=/carrito
+  const { estaAutenticado } = useAutenticacionRequerida();
+
+  // Mostrar loading mientras se verifica autenticación
+  if (!estaAutenticado) {
+    return (
+      <main className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-zinc-600">Verificando acceso...</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-white">
       {/* Header */}

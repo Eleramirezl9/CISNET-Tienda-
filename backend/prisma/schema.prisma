@@ -45,17 +45,19 @@ model Producto {
 // MODELO: Usuario
 // ============================================
 model Usuario {
-  id                String   @id @default(uuid())
-  email             String   @unique @db.VarChar(255)
-  password          String   @db.VarChar(255)
-  nombre            String   @db.VarChar(200)
-  apellido          String?  @db.VarChar(200)
-  telefono          String?  @db.VarChar(20)
-  rol               String   @default("cliente") @db.VarChar(50) // cliente, admin
-  activo            Boolean  @default(true)
-  emailVerificado   Boolean  @default(false) @map("email_verificado")
-  fechaCreacion     DateTime @default(now()) @map("fecha_creacion")
-  fechaActualizacion DateTime @updatedAt @map("fecha_actualizacion")
+  id                  String    @id @default(uuid())
+  email               String    @unique @db.VarChar(255)
+  password            String    @db.VarChar(255)
+  nombre              String    @db.VarChar(200)
+  apellido            String?   @db.VarChar(200)
+  telefono            String?   @db.VarChar(20)
+  rol                 String    @default("cliente") @db.VarChar(50) // cliente, admin
+  activo              Boolean   @default(true)
+  emailVerificado     Boolean   @default(false) @map("email_verificado")
+  refreshTokenHash    String?   @db.VarChar(255) @map("refresh_token_hash")
+  refreshTokenExpira  DateTime? @map("refresh_token_expira")
+  fechaCreacion       DateTime  @default(now()) @map("fecha_creacion")
+  fechaActualizacion  DateTime  @updatedAt @map("fecha_actualizacion")
 
   // Relaciones
   pedidos     Pedido[]

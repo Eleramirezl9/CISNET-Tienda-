@@ -21,7 +21,7 @@ export const ProductoSchema = z.object({
   categoriaId: z.string().uuid(),
   categoria: z.string(),
   etiquetas: z.array(z.string()).default([]),
-  caracteristicas: z.record(z.string()).default({}),
+  caracteristicas: z.record(z.string(), z.any()).default({}),
   activo: z.boolean().default(true),
   destacado: z.boolean().default(false),
   fechaCreacion: z.string().datetime(),

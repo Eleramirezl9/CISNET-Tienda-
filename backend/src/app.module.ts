@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ProductosModule } from './productos/productos.module';
 import { CompartidoModule } from './compartido/compartido.module';
+import { AutenticacionModule } from './autenticacion/autenticacion.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { CompartidoModule } from './compartido/compartido.module';
     
     // Módulos de dominio
     ProductosModule,
+    AutenticacionModule,
     
     // Módulo compartido
     CompartidoModule,

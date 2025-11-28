@@ -1,0 +1,144 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║          🎉 BIENVENIDO AL SISTEMA DE E-COMMERCE CISNET 🎉        ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+
+📋 INICIO RÁPIDO (60 SEGUNDOS)
+═══════════════════════════════════════════════════════════════════
+
+PASO 1: Iniciar Backend
+────────────────────────
+cd backend
+pnpm run start:dev
+
+✅ El backend iniciará en: http://localhost:3001
+✅ Usuarios creados automáticamente
+
+PASO 2: Iniciar Frontend (Nueva terminal)
+──────────────────────────────────────────
+cd frontend
+pnpm run dev
+
+✅ El frontend iniciará en: http://localhost:3000
+
+PASO 3: Iniciar Sesión como Admin
+──────────────────────────────────
+1. Abre: http://localhost:3000/login
+2. Email: admin@cisnet.com
+3. Password: Admin123
+4. ¡Listo! Accede al dashboard en /admin
+
+═══════════════════════════════════════════════════════════════════
+
+🔑 CREDENCIALES DE ACCESO
+═══════════════════════════════════════════════════════════════════
+
+👨‍💼 USUARIO ADMINISTRADOR
+   Email:    admin@cisnet.com
+   Password: Admin123
+   Rol:      ADMIN
+
+   Permisos:
+   ✅ Gestión completa de productos
+   ✅ Gestión completa de usuarios
+   ✅ Gestión completa de pedidos
+   ✅ Gestión de roles y permisos
+   ✅ Ver reportes y estadísticas
+   ✅ Configuración del sistema
+
+👤 USUARIO CLIENTE (Pruebas)
+   Email:    cliente@test.com
+   Password: Cliente123
+   Rol:      CLIENTE
+
+   Permisos:
+   ✅ Ver productos
+   ✅ Crear pedidos
+   ✅ Ver sus propios pedidos
+
+═══════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTACIÓN COMPLETA
+═══════════════════════════════════════════════════════════════════
+
+Lee en este orden:
+
+1. docs/SISTEMA_ADMIN_Y_PERMISOS.md
+   → Sistema de roles, permisos y dashboard admin
+
+2. docs/AUTENTICACION_README.md
+   → Guía de autenticación y seguridad
+
+3. docs/RESUMEN_AUTENTICACION_FINAL.md
+   → Resumen ejecutivo del sistema
+
+═══════════════════════════════════════════════════════════════════
+
+🎯 PÁGINAS DISPONIBLES
+═══════════════════════════════════════════════════════════════════
+
+Frontend:
+├── /                    → Página principal
+├── /login               → Inicio de sesión
+├── /registro            → Registro de usuario
+├── /perfil              → Perfil del usuario
+├── /carrito             → Carrito de compras (protegido)
+└── /admin               → Dashboard admin (solo ADMIN)
+
+Backend:
+├── POST   /api/auth/register    → Registrar usuario
+├── POST   /api/auth/login       → Iniciar sesión
+├── POST   /api/auth/refresh     → Refrescar token
+├── POST   /api/auth/logout      → Cerrar sesión
+└── GET    /api/auth/profile     → Obtener perfil
+
+═══════════════════════════════════════════════════════════════════
+
+✨ LO QUE ESTÁ LISTO
+═══════════════════════════════════════════════════════════════════
+
+Backend:
+✅ Sistema de autenticación completo (JWT + Refresh tokens)
+✅ Sistema de roles (ADMIN, CLIENTE)
+✅ Sistema de permisos granulares (24 permisos)
+✅ Guards de seguridad (JWT, Roles, Permisos, Refresh)
+✅ Usuarios por defecto con seed automático
+✅ Seguridad OWASP-compliant
+✅ Arquitectura hexagonal + DDD
+✅ Módulo de productos (CRUD básico)
+
+Frontend:
+✅ Login y registro funcionales
+✅ Dashboard de administración
+✅ Navegación con logout
+✅ Página de perfil de usuario
+✅ Protección de rutas
+✅ Auto-refresh de tokens transparente
+✅ Diseño responsivo y profesional
+
+Seguridad:
+✅ Contraseñas hasheadas con Argon2
+✅ JWT con tokens de corta duración (15 min)
+✅ Refresh tokens en cookies HttpOnly (7 días)
+✅ Rotación automática de refresh tokens
+✅ CORS restringido
+✅ Helmet security headers
+✅ Validación estricta de inputs
+
+═══════════════════════════════════════════════════════════════════
+
+🚀 ¡TODO LISTO!
+═══════════════════════════════════════════════════════════════════
+
+Tienes un sistema profesional de e-commerce con:
+✅ Autenticación y autorización completas
+✅ Dashboard de administración
+✅ Sistema de roles y permisos
+✅ Seguridad de nivel producción
+✅ Arquitectura escalable
+
+Versión: 1.0.0
+Stack: NestJS + Next.js + TypeScript + Zustand + JWT + Argon2
+
+═══════════════════════════════════════════════════════════════════

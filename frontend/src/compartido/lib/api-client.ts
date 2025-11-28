@@ -1,5 +1,5 @@
 /**
- * API Client - Wrapper tipado para fetch
+ * API Client - Wrapper tipado para fetch con manejo de JWT
  * Maneja la comunicación con el backend NestJS
  */
 
@@ -25,9 +25,80 @@ interface RequestConfig extends RequestInit {
  */
 class ApiClient {
   private baseURL: string;
+  private isRefreshing = false;
+  private refreshPromise: Promise<string | null> | null = null;
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
+  }
+
+  /**
+   * Obtener el token de acceso almacenado
+   */
+  private getAccessToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('accessToken');
+  }
+
+  /**
+   * Guardar el token de acceso
+   */
+  private setAccessToken(token: string): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('accessToken', token);
+  }
+
+  /**
+   * Limpiar tokens de localStorage
+   */
+  private clearTokens(): void {
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('usuario');
+  }
+
+  /**
+   * Refrescar el token de acceso
+   */
+  private async refreshAccessToken(): Promise<string | null> {
+    // Si ya hay una solicitud de refresco, esperar a que termine
+    if (this.isRefreshing && this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.isRefreshing = true;
+
+    this.refreshPromise = (async () => {
+      try {
+        const response = await fetch(`${this.baseURL}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error('Token refresh failed');
+        }
+
+        const data = await response.json();
+        const newAccessToken = data.accessToken;
+        this.setAccessToken(newAccessToken);
+
+        return newAccessToken;
+      } catch (error) {
+        // Si falla el refresh, limpiar y redirigir a login
+        this.clearTokens();
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+        return null;
+      } finally {
+        this.isRefreshing = false;
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
   }
 
   private async request<T>(
@@ -46,17 +117,39 @@ class ApiClient {
     }
 
     // Headers por defecto
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...fetchConfig.headers,
+      ...(fetchConfig.headers as Record<string, string>),
     };
 
+    // Agregar token JWT si existe
+    const token = this.getAccessToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     try {
-      const response = await fetch(url, {
+      let response = await fetch(url, {
         ...fetchConfig,
         headers,
-        credentials: 'include', // Para manejar cookies de sesión
+        credentials: 'include', // Para manejar cookies de sesión (refreshToken)
       });
+
+      // Si recibimos 401, intentar refrescar el token una sola vez
+      const headersObj = fetchConfig.headers as Record<string, string> | undefined;
+      if (response.status === 401 && !headersObj?.['X-No-Retry']) {
+        const newToken = await this.refreshAccessToken();
+        
+        if (newToken) {
+          // Reintentar con nuevo token
+          headers['Authorization'] = `Bearer ${newToken}`;
+          response = await fetch(url, {
+            ...fetchConfig,
+            headers,
+            credentials: 'include',
+          });
+        }
+      }
 
       // Manejo de errores HTTP
       if (!response.ok) {
