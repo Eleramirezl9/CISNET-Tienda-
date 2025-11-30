@@ -11,12 +11,15 @@ import {
   HttpStatus,
   UseGuards,
   Res,
+  Req,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 import { AutenticacionServicio } from '../../aplicacion/casos-uso/autenticacion.servicio';
 import { SolicitudRegistroDTO } from '../../aplicacion/dto/solicitud-registro.dto';
 import { SolicitudLoginDTO } from '../../aplicacion/dto/solicitud-login.dto';
+import { SolicitudOAuthDto } from '../../aplicacion/dto/solicitud-oauth.dto';
 import { RespuestaAutenticacionDTO } from '../../aplicacion/dto/respuesta-autenticacion.dto';
 import { Public } from './decoradores/public.decorador';
 import { UsuarioActual } from './decoradores/usuario-actual.decorador';
@@ -101,6 +104,152 @@ export class AutenticacionControlador {
     }
 
     return resultado;
+  }
+
+  /**
+   * Inicia el flujo de autenticación con Facebook
+   * @GET /auth/facebook
+   */
+  @Public()
+  @Get('facebook')
+  @UseGuards(AuthGuard('facebook'))
+  @ApiOperation({
+    summary: 'Iniciar login con Facebook',
+    description: 'Redirige al usuario a la página de autorización de Facebook',
+  })
+  async facebookLogin() {
+    // Este método solo inicia el flujo OAuth
+    // El guard de Passport redirige automáticamente a Facebook
+  }
+
+  /**
+   * Callback de Facebook OAuth
+   * @GET /auth/facebook/callback
+   */
+  @Public()
+  @Get('facebook/callback')
+  @UseGuards(AuthGuard('facebook'))
+  @ApiOperation({
+    summary: 'Callback de Facebook OAuth',
+    description: 'Procesa la respuesta de Facebook y crea/autentica al usuario',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Autenticación con Facebook exitosa',
+    type: RespuestaAutenticacionDTO,
+  })
+  async facebookCallback(
+    @Req() req: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const facebookUser = req.user as any;
+
+    // Crear DTO con los datos de Facebook
+    const solicitudOAuth: SolicitudOAuthDto = {
+      proveedorId: facebookUser.facebookId,
+      proveedor: 'facebook',
+      email: facebookUser.email,
+      nombre: facebookUser.nombre,
+      apellido: facebookUser.apellido,
+      foto: facebookUser.foto,
+      accessToken: facebookUser.accessToken,
+    };
+
+    // Autenticar o crear usuario
+    const resultado =
+      await this.autenticacionServicio.autenticarOAuth(solicitudOAuth);
+
+    // Guardar refresh token en cookie
+    if ((resultado as any).refreshToken) {
+      response.cookie('refreshToken', (resultado as any).refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/',
+      });
+
+      delete (resultado as any).refreshToken;
+    }
+
+    // Redirigir al frontend con el access token
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    response.redirect(
+      `${frontendUrl}/auth/callback?token=${resultado.accessToken}`,
+    );
+  }
+
+  /**
+   * Inicia el flujo de autenticación con Google
+   * @GET /auth/google
+   */
+  @Public()
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({
+    summary: 'Iniciar login con Google',
+    description: 'Redirige al usuario a la página de autorización de Google',
+  })
+  async googleLogin() {
+    // Este método solo inicia el flujo OAuth
+    // El guard de Passport redirige automáticamente a Google
+  }
+
+  /**
+   * Callback de Google OAuth
+   * @GET /auth/google/callback
+   */
+  @Public()
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({
+    summary: 'Callback de Google OAuth',
+    description: 'Procesa la respuesta de Google y crea/autentica al usuario',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Autenticación con Google exitosa',
+    type: RespuestaAutenticacionDTO,
+  })
+  async googleCallback(
+    @Req() req: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const googleUser = req.user as any;
+
+    // Crear DTO con los datos de Google
+    const solicitudOAuth: SolicitudOAuthDto = {
+      proveedorId: googleUser.googleId,
+      proveedor: 'google',
+      email: googleUser.email,
+      nombre: googleUser.nombre,
+      apellido: googleUser.apellido,
+      foto: googleUser.foto,
+      accessToken: googleUser.accessToken,
+    };
+
+    // Autenticar o crear usuario
+    const resultado =
+      await this.autenticacionServicio.autenticarOAuth(solicitudOAuth);
+
+    // Guardar refresh token en cookie
+    if ((resultado as any).refreshToken) {
+      response.cookie('refreshToken', (resultado as any).refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/',
+      });
+
+      delete (resultado as any).refreshToken;
+    }
+
+    // Redirigir al frontend con el access token
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    response.redirect(
+      `${frontendUrl}/auth/callback?token=${resultado.accessToken}`,
+    );
   }
 
   /**

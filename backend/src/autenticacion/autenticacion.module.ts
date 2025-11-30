@@ -14,6 +14,8 @@ import { Argon2Servicio } from './infraestructura/seguridad/argon2.servicio';
 // Estrategias Passport
 import { EstrategiaJWT } from './infraestructura/passport/estrategia-jwt';
 import { EstrategiaRT } from './infraestructura/passport/estrategia-rt';
+import { EstrategiaFacebook } from './infraestructura/passport/estrategia-facebook';
+import { EstrategiaGoogle } from './infraestructura/passport/estrategia-google';
 
 // Guards
 import { GuardJWT } from './infraestructura/http/guard-jwt';
@@ -57,6 +59,8 @@ import { USUARIO_REPOSITORIO } from './dominio/puertos/usuario.repositorio';
     // Estrategias
     EstrategiaJWT,
     EstrategiaRT,
+    EstrategiaFacebook,
+    EstrategiaGoogle,
 
     // Guards
     GuardJWT,

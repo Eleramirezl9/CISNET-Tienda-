@@ -38,6 +38,14 @@ export interface IUsuarioRepositorio {
    * Invalida el refresh token del usuario (logout)
    */
   invalidarRefreshToken(id: string): Promise<void>;
+
+  /**
+   * Busca un usuario por su ID de proveedor OAuth
+   */
+  obtenerPorProveedorId(
+    proveedor: string,
+    proveedorId: string,
+  ): Promise<Usuario | null>;
 }
 
 export const USUARIO_REPOSITORIO = Symbol('IUsuarioRepositorio');

@@ -66,6 +66,9 @@ export class UsuarioRepositorioPrisma implements IUsuarioRepositorio {
         rol: usuario.rol.toLowerCase(),
         activo: usuario.activo,
         emailVerificado: false,
+        proveedorOAuth: usuario.proveedorOAuth,
+        proveedorId: usuario.proveedorId,
+        foto: usuario.foto,
       },
     });
 
@@ -79,6 +82,9 @@ export class UsuarioRepositorioPrisma implements IUsuarioRepositorio {
       activo: creado.activo,
       fechaCreacion: creado.fechaCreacion,
       fechaActualizacion: creado.fechaActualizacion,
+      proveedorOAuth: creado.proveedorOAuth || undefined,
+      proveedorId: creado.proveedorId || undefined,
+      foto: creado.foto || undefined,
     });
   }
 
@@ -129,6 +135,37 @@ export class UsuarioRepositorioPrisma implements IUsuarioRepositorio {
         refreshTokenHash: null,
         refreshTokenExpira: null,
       },
+    });
+  }
+
+  async obtenerPorProveedorId(
+    proveedor: string,
+    proveedorId: string,
+  ): Promise<Usuario | null> {
+    const usuario = await this.prisma.usuario.findFirst({
+      where: {
+        proveedorOAuth: proveedor,
+        proveedorId: proveedorId,
+      },
+    });
+
+    if (!usuario) return null;
+
+    return new Usuario({
+      id: usuario.id,
+      email: usuario.email,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido || '',
+      passwordHash: usuario.password,
+      rol: usuario.rol.toUpperCase() as 'ADMIN' | 'CLIENTE',
+      activo: usuario.activo,
+      fechaCreacion: usuario.fechaCreacion,
+      fechaActualizacion: usuario.fechaActualizacion,
+      refreshTokenHash: usuario.refreshTokenHash || undefined,
+      refreshTokenExpira: usuario.refreshTokenExpira || undefined,
+      proveedorOAuth: usuario.proveedorOAuth || undefined,
+      proveedorId: usuario.proveedorId || undefined,
+      foto: usuario.foto || undefined,
     });
   }
 }

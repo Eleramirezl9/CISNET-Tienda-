@@ -15,6 +15,11 @@ export class Usuario {
   refreshTokenHash?: string;
   refreshTokenExpira?: Date;
 
+  // Campos para autenticación OAuth
+  proveedorOAuth?: string; // 'facebook', 'google', etc.
+  proveedorId?: string; // ID del usuario en el proveedor OAuth
+  foto?: string; // URL de la foto de perfil
+
   constructor(datos: Partial<Usuario>) {
     Object.assign(this, datos);
   }

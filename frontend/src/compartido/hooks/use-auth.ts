@@ -47,6 +47,7 @@ interface EstadoAutenticacion {
   login: (datos: SolicitudLogin) => Promise<void>;
   logout: () => Promise<void>;
   refrescarSesion: () => Promise<void>;
+  setToken: (token: string) => Promise<void>;
   limpiarError: () => void;
   inicializarDesdeStorage: () => void;
 }
@@ -197,6 +198,48 @@ export const useAuthStore = create<EstadoAutenticacion>((set, get) => ({
         usuario: null,
         estaAutenticado: false,
         error: 'Sesión expirada. Por favor inicia sesión nuevamente.',
+      });
+
+      throw error;
+    }
+  },
+
+  /**
+   * Establecer token desde OAuth (usado en callback de OAuth)
+   */
+  setToken: async (token: string) => {
+    set({ estaCargando: true, error: null });
+
+    try {
+      // Guardar token
+      localStorage.setItem('accessToken', token);
+
+      // Obtener datos del usuario desde el perfil
+      const usuario = await apiClient.get<Usuario>('/auth/profile');
+
+      localStorage.setItem('usuario', JSON.stringify(usuario));
+
+      set({
+        usuario,
+        estaAutenticado: true,
+        estaCargando: false,
+      });
+    } catch (error: unknown) {
+      let mensaje = 'Error al obtener datos del usuario';
+
+      if (error instanceof ApiError) {
+        if (typeof error.data === 'object' && error.data !== null && 'message' in error.data) {
+          mensaje = String((error.data as Record<string, unknown>).message);
+        } else {
+          mensaje = error.statusText;
+        }
+      } else if (error instanceof Error) {
+        mensaje = error.message;
+      }
+
+      set({
+        error: mensaje,
+        estaCargando: false,
       });
 
       throw error;

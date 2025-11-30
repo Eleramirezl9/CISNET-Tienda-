@@ -20,7 +20,10 @@ export class EstrategiaJWT extends PassportStrategy(Strategy) {
     return {
       id: payload.sub,
       email: payload.email,
+      nombre: payload.nombre,
+      apellido: payload.apellido,
       rol: payload.rol,
+      activo: payload.activo,
     };
   }
 }

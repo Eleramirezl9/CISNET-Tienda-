@@ -53,7 +53,7 @@ export function Navbar() {
     : 'bg-blue-100 text-blue-800 border-blue-300';
 
   return (
-    <nav className="bg-white shadow-sm border-b border-slate-200">
+    <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-slate-200 backdrop-blur-sm bg-white/95">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo y navegación principal */}

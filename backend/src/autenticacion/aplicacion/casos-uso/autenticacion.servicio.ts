@@ -18,6 +18,7 @@ import {
 } from '../../dominio/puertos/usuario.repositorio';
 import { SolicitudRegistroDTO } from '../dto/solicitud-registro.dto';
 import { SolicitudLoginDTO } from '../dto/solicitud-login.dto';
+import { SolicitudOAuthDto } from '../dto/solicitud-oauth.dto';
 import { RespuestaAutenticacionDTO } from '../dto/respuesta-autenticacion.dto';
 import { v4 as uuid } from 'uuid';
 
@@ -177,13 +178,93 @@ export class AutenticacionServicio {
   }
 
   /**
+   * Autenticación con proveedor OAuth (Facebook, Google, etc.)
+   *
+   * Si el usuario ya existe (por email o proveedorId), lo autentica.
+   * Si no existe, crea una nueva cuenta automáticamente.
+   *
+   * @throws BadRequestException si falta información requerida
+   */
+  async autenticarOAuth(
+    solicitud: SolicitudOAuthDto,
+  ): Promise<RespuestaAutenticacionDTO> {
+    // Buscar usuario existente por proveedorId o email
+    let usuario = await this.usuarioRepositorio.obtenerPorProveedorId(
+      solicitud.proveedor,
+      solicitud.proveedorId,
+    );
+
+    // Si no existe por proveedorId, buscar por email
+    if (!usuario && solicitud.email) {
+      usuario = await this.usuarioRepositorio.obtenerPorEmail(solicitud.email);
+
+      // Si existe por email pero no tiene proveedorId, vincular la cuenta
+      if (usuario) {
+        usuario.proveedorOAuth = solicitud.proveedor;
+        usuario.proveedorId = solicitud.proveedorId;
+        if (solicitud.foto) {
+          usuario.foto = solicitud.foto;
+        }
+        await this.usuarioRepositorio.actualizar(usuario);
+      }
+    }
+
+    // Si el usuario no existe, crear uno nuevo
+    if (!usuario) {
+      const nuevoUsuario = new Usuario({
+        id: uuid(),
+        email: solicitud.email || `${solicitud.proveedor}_${solicitud.proveedorId}@oauth.local`,
+        nombre: solicitud.nombre,
+        apellido: solicitud.apellido,
+        passwordHash: '', // No tiene contraseña para OAuth
+        rol: RolEnum.CLIENTE,
+        activo: true,
+        proveedorOAuth: solicitud.proveedor,
+        proveedorId: solicitud.proveedorId,
+        foto: solicitud.foto,
+        fechaCreacion: new Date(),
+        fechaActualizacion: new Date(),
+      });
+
+      usuario = await this.usuarioRepositorio.crear(nuevoUsuario);
+    }
+
+    // Verificar que el usuario esté activo
+    if (!usuario.estaActivo()) {
+      throw new UnauthorizedException('El usuario no está activo');
+    }
+
+    // Generar tokens
+    const accessToken = this.generarAccessToken(usuario);
+    const refreshToken = this.generarRefreshToken(usuario);
+
+    // Guardar refresh token
+    const refreshTokenHash = await this.hashingService.hashear(refreshToken);
+    const refreshTokenExpira = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await this.usuarioRepositorio.actualizarRefreshToken(
+      usuario.id,
+      refreshTokenHash,
+      refreshTokenExpira,
+    );
+
+    const respuesta = new RespuestaAutenticacionDTO(accessToken, usuario);
+    (respuesta as any).refreshToken = refreshToken;
+
+    return respuesta;
+  }
+
+  /**
    * Genera un JWT access token
    */
   private generarAccessToken(usuario: Usuario): string {
     const payload = {
       sub: usuario.id,
       email: usuario.email,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
       rol: usuario.rol,
+      activo: usuario.activo,
     };
 
     return this.jwtService.sign(payload, {

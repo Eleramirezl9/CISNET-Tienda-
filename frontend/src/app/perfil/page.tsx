@@ -62,15 +62,15 @@ export default function PerfilPage() {
               <div className="w-32 h-32 rounded-full bg-white shadow-lg flex items-center justify-center border-4 border-white relative">
                 <div className="w-28 h-28 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center">
                   <span className="text-4xl font-bold text-white">
-                    {usuario.nombre.charAt(0).toUpperCase()}
-                    {usuario.apellido.charAt(0).toUpperCase()}
+                    {usuario.nombre?.charAt(0)?.toUpperCase() || 'U'}
+                    {usuario.apellido?.charAt(0)?.toUpperCase() || ''}
                   </span>
                 </div>
                 {/* Indicador de estado online */}
                 <div className="absolute bottom-2 right-2 h-6 w-6 rounded-full bg-green-500 border-4 border-white shadow-md"></div>
               </div>
               <h2 className="mt-4 text-2xl font-bold text-slate-900">
-                {usuario.nombre} {usuario.apellido}
+                {usuario.nombre || ''} {usuario.apellido || ''}
               </h2>
               <p className="text-slate-600 mt-1">{usuario.email}</p>
               <div className="flex items-center gap-2 mt-3">

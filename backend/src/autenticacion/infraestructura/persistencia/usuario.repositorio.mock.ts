@@ -51,4 +51,20 @@ export class UsuarioRepositorioMock implements IUsuarioRepositorio {
       usuario.refreshTokenExpira = undefined;
     }
   }
+
+  async obtenerPorProveedorId(
+    proveedor: string,
+    proveedorId: string,
+  ): Promise<Usuario | null> {
+    // Buscar usuario por proveedor OAuth y su ID
+    for (const usuario of this.usuarios.values()) {
+      if (
+        usuario.proveedorOAuth === proveedor &&
+        usuario.proveedorId === proveedorId
+      ) {
+        return usuario;
+      }
+    }
+    return null;
+  }
 }

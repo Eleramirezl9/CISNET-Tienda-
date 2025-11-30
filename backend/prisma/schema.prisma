@@ -56,6 +56,12 @@ model Usuario {
   emailVerificado     Boolean   @default(false) @map("email_verificado")
   refreshTokenHash    String?   @db.VarChar(255) @map("refresh_token_hash")
   refreshTokenExpira  DateTime? @map("refresh_token_expira")
+
+  // Campos OAuth
+  proveedorOAuth      String?   @db.VarChar(50) @map("proveedor_oauth") // facebook, google
+  proveedorId         String?   @db.VarChar(255) @map("proveedor_id")
+  foto                String?   @db.VarChar(500)
+
   fechaCreacion       DateTime  @default(now()) @map("fecha_creacion")
   fechaActualizacion  DateTime  @updatedAt @map("fecha_actualizacion")
 
@@ -64,6 +70,7 @@ model Usuario {
   direcciones Direccion[]
 
   @@index([email])
+  @@index([proveedorOAuth, proveedorId])
   @@map("usuarios")
 }
 
