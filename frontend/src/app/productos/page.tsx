@@ -8,78 +8,27 @@ import { ProductosGrid } from './productos-grid';
 import Link from 'next/link';
 import type { Producto } from '@/caracteristicas/catalogo-productos';
 
-// Datos de ejemplo (mock) - Reemplazar con obtenerProductos() del service
-const productosEjemplo: Producto[] = [
-  {
-    id: '1',
-    nombre: 'Laptop Dell XPS 15',
-    descripcion: 'Laptop de alto rendimiento con procesador Intel i7 y 16GB RAM',
-    slug: 'laptop-dell-xps-15',
-    precio: 12500,
-    precioAnterior: 15000,
-    stock: 5,
-    imagenPrincipal: 'https://res.cloudinary.com/demo/image/upload/laptop.jpg',
-    imagenes: [],
-    categoriaId: 'cat-1',
-    categoria: 'Computadoras',
-    etiquetas: ['laptop', 'dell', 'gaming'],
-    caracteristicas: {
-      procesador: 'Intel i7',
-      ram: '16GB',
-      almacenamiento: '512GB SSD',
-    },
-    activo: true,
-    destacado: true,
-    fechaCreacion: new Date().toISOString(),
-    fechaActualizacion: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    nombre: 'Mouse Logitech MX Master 3',
-    descripcion: 'Mouse ergonómico profesional con conectividad Bluetooth',
-    slug: 'mouse-logitech-mx-master-3',
-    precio: 850,
-    precioAnterior: null,
-    stock: 15,
-    imagenPrincipal: 'https://res.cloudinary.com/demo/image/upload/mouse.jpg',
-    imagenes: [],
-    categoriaId: 'cat-2',
-    categoria: 'Accesorios',
-    etiquetas: ['mouse', 'logitech', 'wireless'],
-    caracteristicas: {
-      conectividad: 'Bluetooth',
-      bateria: '70 días',
-    },
-    activo: true,
-    destacado: false,
-    fechaCreacion: new Date().toISOString(),
-    fechaActualizacion: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    nombre: 'Teclado Mecánico Corsair K95',
-    descripcion: 'Teclado mecánico RGB con switches Cherry MX',
-    slug: 'teclado-mecanico-corsair-k95',
-    precio: 1200,
-    precioAnterior: 1400,
-    stock: 0,
-    imagenPrincipal: 'https://res.cloudinary.com/demo/image/upload/keyboard.jpg',
-    imagenes: [],
-    categoriaId: 'cat-2',
-    categoria: 'Accesorios',
-    etiquetas: ['teclado', 'mecánico', 'gaming'],
-    caracteristicas: {
-      switches: 'Cherry MX Red',
-      iluminacion: 'RGB',
-    },
-    activo: true,
-    destacado: true,
-    fechaCreacion: new Date().toISOString(),
-    fechaActualizacion: new Date().toISOString(),
-  },
-];
+async function obtenerProductos(): Promise<Producto[]> {
+  try {
+    const response = await fetch('http://localhost:3001/api/productos', {
+      cache: 'no-store', // Siempre obtener datos frescos
+    });
 
-export default function ProductosPage() {
+    if (!response.ok) {
+      console.error('Error al obtener productos:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    return data.productos || [];
+  } catch (error) {
+    console.error('Error al cargar productos:', error);
+    return [];
+  }
+}
+
+export default async function ProductosPage() {
+  const productos = await obtenerProductos();
   return (
     <main className="min-h-screen bg-white">
       {/* Navegación de migas de pan */}
@@ -118,9 +67,19 @@ export default function ProductosPage() {
 
       {/* Contenido principal */}
       <div className="max-w-7xl mx-auto px-8 py-20">
-        <Suspense fallback={<LoadingSkeleton />}>
-          <ProductosGrid productos={productosEjemplo} />
-        </Suspense>
+        {productos.length > 0 ? (
+          <ProductosGrid productos={productos} />
+        ) : (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">📦</div>
+            <h3 className="text-2xl font-semibold text-zinc-900 mb-2">
+              No hay productos disponibles
+            </h3>
+            <p className="text-zinc-600">
+              Vuelve pronto para descubrir nuevos productos
+            </p>
+          </div>
+        )}
       </div>
 
       {/* CTA de Contacto */}

@@ -153,12 +153,27 @@ export class ProductoRepositorioPrisma implements IProductoRepositorio {
 
     const totalPaginas = Math.ceil(total / limite);
 
+    // Mapear productos con manejo de errores
+    const items = productos
+      .map((p) => {
+        try {
+          return this.mapearAEntidad(p);
+        } catch (error) {
+          // Loggear solo errores críticos, no en producción
+          if (process.env.NODE_ENV !== 'production') {
+            console.error(`Error mapeando producto ${p.id}:`, error.message);
+          }
+          return null;
+        }
+      })
+      .filter((p) => p !== null) as Producto[];
+
     return {
-      items: productos.map((p) => this.mapearAEntidad(p)),
-      total,
+      items,
+      total: items.length, // Actualizar total con productos mapeados exitosamente
       pagina,
       limite,
-      totalPaginas,
+      totalPaginas: Math.ceil(items.length / limite),
     };
   }
 
@@ -230,13 +245,24 @@ export class ProductoRepositorioPrisma implements IProductoRepositorio {
    * Mapear de Prisma a Entidad de Dominio
    */
   private mapearAEntidad(data: any): Producto {
+    // Convertir Decimal de Prisma a number
+    const precio = typeof data.precio === 'object' && data.precio !== null
+      ? Number(data.precio.toString())
+      : data.precio;
+
+    const precioAnterior = data.precioAnterior
+      ? typeof data.precioAnterior === 'object' && data.precioAnterior !== null
+        ? Number(data.precioAnterior.toString())
+        : data.precioAnterior
+      : null;
+
     return new Producto(
       data.id,
       data.nombre,
       data.descripcion,
       data.slug,
-      Precio.desde(data.precio),
-      data.precioAnterior ? Precio.desde(data.precioAnterior) : null,
+      Precio.desde(precio),
+      precioAnterior ? Precio.desde(precioAnterior) : null,
       data.stock,
       data.imagenPrincipal,
       data.imagenes,

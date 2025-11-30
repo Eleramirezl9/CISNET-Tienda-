@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/compartido/hooks/use-auth';
+import { IconoCarrito } from '@/caracteristicas/carrito-compras';
 import { useState, useEffect, useRef } from 'react';
 
 export function Navbar() {
@@ -98,16 +99,6 @@ export function Navbar() {
                 Servicios
               </Link>
               <Link
-                href="/carrito"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  pathname === '/carrito'
-                    ? 'border-slate-900 text-slate-900'
-                    : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'
-                }`}
-              >
-                Carrito
-              </Link>
-              <Link
                 href="/quienes-somos"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                   pathname === '/quienes-somos'
@@ -154,6 +145,9 @@ export function Navbar() {
 
           {/* Menú de usuario */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center gap-4">
+            {/* Icono de Carrito */}
+            <IconoCarrito />
+
             {/* Botón de Pagos */}
             <button className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors font-medium">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -356,16 +350,6 @@ export function Navbar() {
               }`}
             >
               Servicios
-            </Link>
-            <Link
-              href="/carrito"
-              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                pathname === '/carrito'
-                  ? 'bg-slate-50 border-slate-500 text-slate-700'
-                  : 'border-transparent text-slate-500 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-700'
-              }`}
-            >
-              Carrito
             </Link>
             <Link
               href="/quienes-somos"

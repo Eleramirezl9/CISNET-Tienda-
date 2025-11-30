@@ -42,10 +42,12 @@ export class CrearProductoDto {
   @ApiProperty({
     description: 'Slug único del producto (URL amigable)',
     example: 'laptop-dell-xps-15',
+    required: false,
   })
+  @IsOptional()
   @IsString()
   @MinLength(1)
-  slug: string;
+  slug?: string;
 
   @ApiProperty({
     description: 'Precio del producto en Quetzales',
@@ -78,9 +80,11 @@ export class CrearProductoDto {
   @ApiProperty({
     description: 'URL de la imagen principal',
     example: 'https://res.cloudinary.com/demo/image/upload/laptop.jpg',
+    required: false,
   })
+  @IsOptional()
   @IsUrl()
-  imagenPrincipal: string;
+  imagenPrincipal?: string;
 
   @ApiProperty({
     description: 'URLs de imágenes adicionales',
@@ -95,9 +99,9 @@ export class CrearProductoDto {
 
   @ApiProperty({
     description: 'ID de la categoría',
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    example: 'electronica',
   })
-  @IsUUID()
+  @IsString()
   categoriaId: string;
 
   @ApiProperty({
