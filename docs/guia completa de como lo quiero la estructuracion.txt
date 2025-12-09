@@ -1,0 +1,60 @@
+
+
+Actúa como un Frontend Lead Architect experto en Next.js 14 (App Router), TypeScript y Patrones de Diseño Avanzados (DDD, Atomic Design, Feature Sliced).
+
+Estoy iniciando el Frontend de un E-commerce Enterprise Grade y quiero establecer una arquitectura estricta desde el minuto cero.
+
+### 1. ESTRUCTURA DE CARPETAS (La Ley)
+Quiero que configures el proyecto respetando esta jerarquía exacta. NO uses la carpeta `pages` ni estructuras planas tradicionales.
+
+```text
+src/
+├── app/                    # Next.js App Router
+├── caracteristicas/        # FEATURE SLICED DESIGN (DDD)
+│   ├── [nombre-feature]/   # Ej: gestion-productos, carrito-compras
+│   │   ├── dominio/        # Tipos e Interfaces puras (Zod schemas)
+│   │   ├── infraestructura/# Fetching, Adaptadores, Server Actions
+│   │   ├── aplicacion/     # Hooks personalizados (lógica de vista)
+│   │   ├── ui/             # Componentes exclusivos de esta feature
+│   │   └── index.ts        # Barril de exportación pública
+├── compartido/             # SHARED KERNEL
+│   ├── ui/                 # Componentes Shadcn/UI (Atomos/Moleculas)
+│   ├── hooks/              # Hooks globales
+│   ├── lib/                # Utilidades (Fetch wrapper, Formaters)
+│   └── tipos/              # Tipos globales
+└── design/                 # Tokens, Fuentes, Constantes de diseño
+2. REGLAS DE DESARROLLO (Guidelines)
+Server Actions: Toda interacción con el backend (NestJS) debe hacerse a través de Server Actions en la capa de infraestructura de cada feature.
+
+UI Kit: Usaremos shadcn/ui. Los componentes base (Button, Input) van en compartido/ui.
+
+Gestión de Estado: Usa Zustand para estados globales complejos (Carrito) y React Query (TanStack) para el fetching de datos.
+
+Tipado Estricto: Prohibido usar any. Todo DTO debe tener su interfaz en dominio.
+
+3. TAREA INICIAL: EL SCAFFOLDING
+Genera los siguientes archivos clave para arrancar el proyecto con el pie derecho:
+
+src/compartido/lib/api-client.ts: Un wrapper de fetch tipado que maneje la URL base del Backend y errores comunes.
+
+src/caracteristicas/catalogo-productos/dominio/producto.types.ts: La interfaz completa de un Producto (con precio, slug, imágenes).
+
+src/caracteristicas/catalogo-productos/infraestructura/productos.service.ts: Una función que obtenga los productos desde el Backend (simulado por ahora) usando Server Actions.
+
+src/caracteristicas/catalogo-productos/ui/producto-card.tsx: Un componente visual hermoso usando Tailwind, que reciba la interfaz de Producto y muestre: Imagen (next/image), Título, Precio (formateado GTQ) y Botón de "Añadir".
+
+Nota: Usa Tailwind CSS para el estilo. Prioriza la legibilidad y el "Clean Code".
+
+
+***
+
+### ¿Por qué este Prompt es "Oro"?
+Con este prompt, no solo obtienes código. Obtienes un **asistente que ya sabe cómo piensas**.
+A partir de ahora, cada vez que le pidas algo ("Claude, haz el carrito"), él sabrá automáticamente que debe crear la carpeta `caracteristicas/carrito` con sus subcarpetas `dominio`, `infraestructura`, etc.
+
+### Siguiente Paso (Acción Inmediata)
+1.  Ejecuta este prompt en Claude.
+2.  Copia el código que te genere en tu editor (VS Code).
+3.  Una vez tengas esos archivos base, podemos pasar a configurar la parte visual (Shadcn/UI).
+
+¿Te parece bien arrancar así?

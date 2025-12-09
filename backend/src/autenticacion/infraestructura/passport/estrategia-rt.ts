@@ -3,13 +3,23 @@
  * Valida el refresh token en el endpoint de refresco
  */
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 
 @Injectable()
 export class EstrategiaRT extends PassportStrategy(Strategy, 'jwt-refresh') {
-  constructor() {
+  constructor(private configService: ConfigService) {
+    const secret = configService.get<string>('JWT_REFRESH_SECRET');
+
+    if (!secret) {
+      throw new Error(
+        'JWT_REFRESH_SECRET is not defined in environment variables. ' +
+        'Please check your .env file in the backend directory.'
+      );
+    }
+
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
@@ -18,7 +28,7 @@ export class EstrategiaRT extends PassportStrategy(Strategy, 'jwt-refresh') {
         },
       ]),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_REFRESH_SECRET || 'tu-secreto-refresh-super-seguro',
+      secretOrKey: secret,
       passReqToCallback: true,
     });
   }

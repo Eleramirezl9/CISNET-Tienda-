@@ -128,6 +128,16 @@ export function Navbar() {
               >
                 Soporte
               </Link>
+              <Link
+                href="/rastrear-orden"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === '/rastrear-orden'
+                    ? 'border-slate-900 text-slate-900'
+                    : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'
+                }`}
+              >
+                Rastrear Orden
+              </Link>
               {esAdmin && (
                 <Link
                   href="/admin"
@@ -228,16 +238,28 @@ export function Navbar() {
                       </Link>
 
                       {esAdmin && (
-                        <Link
-                          href="/admin"
-                          className="flex items-center gap-3 px-4 py-2 text-sm text-purple-600 hover:bg-purple-50 transition-colors"
-                          onClick={() => setMenuUsuarioAbierto(false)}
-                        >
-                          <svg className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                          </svg>
-                          <span>Panel Admin</span>
-                        </Link>
+                        <>
+                          <Link
+                            href="/admin"
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-purple-600 hover:bg-purple-50 transition-colors"
+                            onClick={() => setMenuUsuarioAbierto(false)}
+                          >
+                            <svg className="h-4 w-4 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            <span>Panel Admin</span>
+                          </Link>
+                          <Link
+                            href="/admin/ordenes"
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                            onClick={() => setMenuUsuarioAbierto(false)}
+                          >
+                            <svg className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            <span>Gestión de Órdenes</span>
+                          </Link>
+                        </>
                       )}
 
                       <div className="border-t border-slate-100 my-2"></div>
@@ -381,6 +403,16 @@ export function Navbar() {
             >
               Soporte
             </Link>
+            <Link
+              href="/rastrear-orden"
+              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+                pathname === '/rastrear-orden'
+                  ? 'bg-slate-50 border-slate-500 text-slate-700'
+                  : 'border-transparent text-slate-500 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-700'
+              }`}
+            >
+              Rastrear Orden
+            </Link>
             {esAdmin && (
               <Link
                 href="/admin"
@@ -432,15 +464,26 @@ export function Navbar() {
                   <span>Mi perfil</span>
                 </Link>
                 {esAdmin && (
-                  <Link
-                    href="/admin"
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium text-purple-700 hover:bg-purple-50 transition-colors"
-                  >
-                    <svg className="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    <span>Panel Admin</span>
-                  </Link>
+                  <>
+                    <Link
+                      href="/admin"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium text-purple-700 hover:bg-purple-50 transition-colors"
+                    >
+                      <svg className="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                      <span>Panel Admin</span>
+                    </Link>
+                    <Link
+                      href="/admin/ordenes"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                    >
+                      <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                      </svg>
+                      <span>Gestión de Órdenes</span>
+                    </Link>
+                  </>
                 )}
                 <button
                   onClick={handleLogout}

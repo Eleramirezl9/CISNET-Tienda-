@@ -15,6 +15,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
   SheetFooter,
   ScrollArea,
   Separator,
@@ -80,6 +81,10 @@ export function CarritoSheet({ abierto, onCerrar }: CarritoSheetProps) {
               <SheetTitle className="text-2xl font-bold text-zinc-900">
                 Tu Carrito
               </SheetTitle>
+              <SheetDescription className="sr-only">
+                Panel lateral del carrito de compras con {cantidadTotal}{' '}
+                {cantidadTotal === 1 ? 'producto' : 'productos'}
+              </SheetDescription>
               <p className="text-sm text-zinc-600 font-light mt-0.5">
                 {cantidadTotal} {cantidadTotal === 1 ? 'producto' : 'productos'}
               </p>

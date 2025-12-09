@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ProductosModule } from './productos/productos.module';
 import { CompartidoModule } from './compartido/compartido.module';
 import { AutenticacionModule } from './autenticacion/autenticacion.module';
+import { OrdenesModule } from './ordenes/ordenes.module';
+import { PagosModule } from './pagos/pagos.module';
 
 @Module({
   imports: [
@@ -11,11 +13,13 @@ import { AutenticacionModule } from './autenticacion/autenticacion.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    
+
     // Módulos de dominio
     ProductosModule,
     AutenticacionModule,
-    
+    OrdenesModule,
+    PagosModule,
+
     // Módulo compartido
     CompartidoModule,
   ],

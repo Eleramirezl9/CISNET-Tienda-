@@ -91,7 +91,7 @@ export default function AdminDashboard() {
       titulo: 'Ver Pedidos',
       descripcion: 'Administrar pedidos y ventas',
       icono: '🛒',
-      href: '/admin/pedidos',
+      href: '/admin/ordenes',
       color: 'bg-purple-500 hover:bg-purple-600',
     },
     {

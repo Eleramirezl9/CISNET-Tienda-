@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm run build:*)"
+      "Bash(pnpm run build:*)",
+      "Bash(pnpm dlx shadcn@latest add:*)",
+      "Bash(cat:*)",
+      "Bash(curl:*)",
+      "Bash(npx prisma migrate:*)",
+      "Bash(findstr:*)",
+      "Bash(ls:*)",
+      "Bash(dir:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

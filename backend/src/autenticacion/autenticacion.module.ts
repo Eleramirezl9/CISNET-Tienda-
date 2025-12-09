@@ -43,12 +43,18 @@ import { USUARIO_REPOSITORIO } from './dominio/puertos/usuario.repositorio';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'tu-secreto-super-seguro-cambia-esto',
-        signOptions: {
-          expiresIn: '15m',
-        },
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_SECRET');
+        if (!secret) {
+          throw new Error('JWT_SECRET no está configurado en las variables de entorno');
+        }
+        return {
+          secret,
+          signOptions: {
+            expiresIn: '15m',
+          },
+        };
+      },
       inject: [ConfigService],
     }),
   ],

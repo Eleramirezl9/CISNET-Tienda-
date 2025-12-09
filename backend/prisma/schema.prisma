@@ -171,3 +171,79 @@ model Pago {
   @@index([estado])
   @@map("pagos")
 }
+
+// ============================================
+// MODELO: Orden (Guest Checkout)
+// ============================================
+model Orden {
+  id                  String   @id @default(uuid())
+  numeroOrden         String   @unique @db.VarChar(20) @map("numero_orden")
+
+  // Información del cliente (sin cuenta)
+  nombreCompleto      String   @db.VarChar(200) @map("nombre_completo")
+  telefono            String   @db.VarChar(8)
+  email               String?  @db.VarChar(255)
+
+  // Dirección de envío
+  direccion           String   @db.VarChar(500)
+  departamento        String   @db.VarChar(100)
+  municipio           String   @db.VarChar(100)
+  zonaOColonia        String   @db.VarChar(100) @map("zona_o_colonia")
+  referencia          String?  @db.VarChar(200)
+
+  // Detalles de la orden
+  estado              String   @default("pendiente") @db.VarChar(50) // pendiente, confirmada, en_proceso, enviada, entregada, cancelada
+  metodoPago          String   @db.VarChar(50) @map("metodo_pago") // tarjeta_gt, billetera_fri, contra_entrega, tarjeta_internacional
+
+  // Totales
+  subtotal            Decimal  @db.Decimal(10, 2)
+  impuestos           Decimal  @db.Decimal(10, 2)
+  envio               Decimal  @db.Decimal(10, 2)
+  total               Decimal  @db.Decimal(10, 2)
+
+  // Notas
+  notas               String?  @db.Text
+
+  // Información de pago (PayPal, Stripe, etc.)
+  paypalOrderId       String?  @map("paypal_order_id") @db.VarChar(255)
+  paypalCaptureId     String?  @map("paypal_capture_id") @db.VarChar(255)
+
+  // Información de pago (Recurrente)
+  recurrenteCheckoutId     String?  @map("recurrente_checkout_id") @db.VarChar(255)
+  recurrenteTransactionId  String?  @map("recurrente_transaction_id") @db.VarChar(255)
+
+  estadoPago          String   @default("pendiente") @db.VarChar(50) @map("estado_pago") // pendiente, completado, fallido
+
+  // Timestamps
+  fechaCreacion       DateTime @default(now()) @map("fecha_creacion")
+  fechaActualizacion  DateTime @updatedAt @map("fecha_actualizacion")
+
+  // Relaciones
+  items ItemOrden[]
+
+  @@index([numeroOrden])
+  @@index([estado])
+  @@index([telefono])
+  @@index([fechaCreacion])
+  @@map("ordenes")
+}
+
+// ============================================
+// MODELO: Item de Orden (Guest)
+// ============================================
+model ItemOrden {
+  id              String  @id @default(uuid())
+  ordenId         String  @map("orden_id")
+  productoId      String  @map("producto_id")
+  nombreProducto  String  @db.VarChar(200) @map("nombre_producto")
+  cantidad        Int
+  precioUnitario  Decimal @db.Decimal(10, 2) @map("precio_unitario")
+  subtotal        Decimal @db.Decimal(10, 2)
+
+  // Relaciones
+  orden   Orden @relation(fields: [ordenId], references: [id], onDelete: Cascade)
+
+  @@index([ordenId])
+  @@index([productoId])
+  @@map("items_orden")
+}

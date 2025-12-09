@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { InitAuth } from './init-auth';
 import { Navbar } from '@/compartido/componentes/navbar';
+import { Toaster } from '@/compartido/ui';
 import './globals.css';
 
 const inter = Inter({
@@ -27,6 +28,7 @@ export default function RootLayout({
         <InitAuth>
           <Navbar />
           {children}
+          <Toaster />
         </InitAuth>
       </body>
     </html>

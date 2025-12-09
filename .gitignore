@@ -65,6 +65,8 @@ Thumbs.db
 *.bak
 *.backup
 *~
+*.zip
+%TEMP%ngrok.zip
 
 # Database
 *.db
@@ -111,9 +113,14 @@ env/
 # IDE plugins
 .vscode-test
 
-# Documentation - Allow specific files, ignore drafts
-docs/*
-!docs/DOCKER_SETUP.md
-!docs/SECURITY.md
-!docs/QUICK_START.md
-!docs/.gitkeep
+# Documentation - Keep estructura organizada
+!docs/ARQUITECTURA.md
+!docs/REFACTORIZACION_ARQUITECTURA.md
+!docs/implementaciones/
+!docs/implementaciones/*.md
+
+# Herramientas y binarios
+ngrok
+ngrok.exe
+*.exe
+!node_modules/**/*.exe

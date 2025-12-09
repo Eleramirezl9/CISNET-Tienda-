@@ -26,7 +26,7 @@ import { UsuarioActual } from './decoradores/usuario-actual.decorador';
 import { GuardJWT } from './guard-jwt';
 import { GuardRefresh } from './guard-refresh';
 
-@ApiTags('Autenticación')
+@ApiTags('autenticacion')
 @Controller('auth')
 export class AutenticacionControlador {
   constructor(private readonly autenticacionServicio: AutenticacionServicio) {}
@@ -40,16 +40,35 @@ export class AutenticacionControlador {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Registrar nuevo usuario',
-    description: 'Crea una nueva cuenta de usuario',
+    description: 'Crea una nueva cuenta de usuario con email y contraseña. Devuelve el access token y los datos del usuario.',
   })
   @ApiResponse({
     status: 201,
     description: 'Usuario registrado exitosamente',
     type: RespuestaAutenticacionDTO,
+    schema: {
+      example: {
+        accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        usuario: {
+          id: 'uuid-123',
+          email: 'nuevo@example.com',
+          nombre: 'María',
+          apellido: 'González',
+          rol: 'cliente',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 400,
     description: 'El email ya existe o datos inválidos',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: 'El email ya está registrado',
+        error: 'Bad Request',
+      },
+    },
   })
   async register(
     @Body() solicitud: SolicitudRegistroDTO,
@@ -72,16 +91,35 @@ export class AutenticacionControlador {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Login de usuario',
-    description: 'Autentica un usuario y devuelve tokens',
+    description: 'Autentica un usuario y devuelve tokens (access token en JSON, refresh token en cookie HttpOnly)',
   })
   @ApiResponse({
     status: 200,
     description: 'Login exitoso',
     type: RespuestaAutenticacionDTO,
+    schema: {
+      example: {
+        accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        usuario: {
+          id: 'uuid-123',
+          email: 'usuario@example.com',
+          nombre: 'Juan',
+          apellido: 'Pérez',
+          rol: 'cliente',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 401,
     description: 'Credenciales inválidas',
+    schema: {
+      example: {
+        statusCode: 401,
+        message: 'Credenciales inválidas',
+        error: 'Unauthorized',
+      },
+    },
   })
   async login(
     @Body() solicitud: SolicitudLoginDTO,
