@@ -16,33 +16,20 @@ export function AnimacionEntrada({
   tipo = 'fade-up'
 }: AnimacionEntradaProps) {
   const [estaVisible, setEstaVisible] = useState(false);
-  const [prefiereMovimientoReducido, setPrefiereMovimientoReducido] = useState(false);
   const elementoRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefiereMovimientoReducido(mediaQuery.matches);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setPrefiereMovimientoReducido(e.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
-  useEffect(() => {
-    if (prefiereMovimientoReducido) {
-      setEstaVisible(true);
-      return;
-    }
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setTimeout(() => {
+          if (delay > 0) {
+            timeoutRef.current = setTimeout(() => {
+              setEstaVisible(true);
+            }, delay);
+          } else {
             setEstaVisible(true);
-          }, delay);
+          }
         }
       },
       { threshold: 0.1 }
@@ -56,8 +43,11 @@ export function AnimacionEntrada({
       if (elementoRef.current) {
         observer.unobserve(elementoRef.current);
       }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
-  }, [delay, prefiereMovimientoReducido]);
+  }, [delay]);
 
   const animaciones = {
     'fade-up': 'translate-y-8 opacity-0',
@@ -67,12 +57,10 @@ export function AnimacionEntrada({
     'slide-right': '-translate-x-8 opacity-0',
   };
 
-  const duracion = prefiereMovimientoReducido ? 'duration-0' : 'duration-700';
-
   return (
     <div
       ref={elementoRef}
-      className={`transition-all ${duracion} ease-out ${
+      className={`transition-all duration-700 ease-out ${
         estaVisible
           ? 'translate-y-0 translate-x-0 opacity-100 scale-100'
           : animaciones[tipo]

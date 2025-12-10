@@ -265,7 +265,7 @@ export default function QuienesSomosPage() {
 
           <AnimacionEntrada delay={600}>
             <ItemLineaTiempo
-              ano="2024"
+              ano="2025"
               titulo="Nueva Plataforma"
               descripcion="Lanzamos nuestra plataforma renovada con integración de IA y nuevas funcionalidades avanzadas."
               icono={
