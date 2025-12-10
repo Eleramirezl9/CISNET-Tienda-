@@ -182,7 +182,6 @@ export default function DetalleOrdenAdminPage({ params }: PageProps) {
             <div className="flex-1 w-full">
               <Label htmlFor="estado">Estado Actual</Label>
               <Select
-                id="estado"
                 value={orden.estado}
                 onValueChange={(value) => cambiarEstado(value as EstadoOrden)}
                 disabled={actualizandoEstado || orden.estado === 'cancelada'}

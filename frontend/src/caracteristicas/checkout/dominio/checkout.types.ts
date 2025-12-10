@@ -91,7 +91,7 @@ export const checkoutFormSchema = z.object({
 
   // Método de pago
   metodoPago: z.nativeEnum(MetodoPago, {
-    required_error: 'Selecciona un método de pago',
+    message: 'Selecciona un método de pago',
   }),
 
   // Notas adicionales (opcional)
