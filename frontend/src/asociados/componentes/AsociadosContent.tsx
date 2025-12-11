@@ -167,8 +167,13 @@ export function AsociadosContent() {
         <section id="asociados" className="max-w-7xl mx-auto px-8 py-24">
           <AnimacionEntrada>
             <div className="text-center mb-16">
-              <div className="inline-block px-4 py-2 bg-amber-100 rounded-full text-sm font-semibold text-amber-700 mb-6">
-                Destacados
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-full border border-amber-200/60 shadow-sm mb-6">
+                <svg className="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                </svg>
+                <span className="text-sm font-semibold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent">
+                  Colaboradores Premium
+                </span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">
                 Asociados Destacados
@@ -197,8 +202,16 @@ export function AsociadosContent() {
         <div className="max-w-7xl mx-auto px-8">
           <AnimacionEntrada>
             <div className="text-center mb-16">
-              <div className="inline-block px-4 py-2 bg-zinc-200 rounded-full text-sm font-semibold text-zinc-700 mb-6">
-                Nuestra Red
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-full border border-zinc-200 shadow-sm mb-6">
+                <svg className="w-4 h-4 text-zinc-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <span className="text-sm font-semibold text-zinc-700">
+                  Nuestra Comunidad
+                </span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">
                 {asociadosDestacados.length > 0 ? 'Todos Nuestros Asociados' : 'Nuestros Asociados'}
@@ -257,8 +270,13 @@ export function AsociadosContent() {
       <section className="max-w-7xl mx-auto px-8 py-24">
         <AnimacionEntrada>
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-2 bg-zinc-100 rounded-full text-sm font-semibold text-zinc-700 mb-6">
-              Ventajas
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-full border border-emerald-200/60 shadow-sm mb-6">
+              <svg className="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+              <span className="text-sm font-semibold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
+                Ventajas Exclusivas
+              </span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">
               Beneficios de ser Asociado
@@ -293,8 +311,16 @@ export function AsociadosContent() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <AnimacionEntrada tipo="slide-right">
               <div>
-                <div className="inline-block px-4 py-2 bg-white/10 rounded-full text-sm font-semibold text-white mb-6">
-                  Únete a Nosotros
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 shadow-sm mb-6">
+                  <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <line x1="19" y1="8" x2="19" y2="14" />
+                    <line x1="22" y1="11" x2="16" y2="11" />
+                  </svg>
+                  <span className="text-sm font-semibold text-white">
+                    Únete a Nosotros
+                  </span>
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
                   ¿Quieres ser parte de nuestra red?

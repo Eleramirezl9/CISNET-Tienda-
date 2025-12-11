@@ -8,8 +8,15 @@ interface FormularioSolicitudProps {
   onExito?: () => void;
 }
 
+interface ErroresValidacion {
+  nombre?: string;
+  email?: string;
+  telefono?: string;
+  mensaje?: string;
+}
+
 export function FormularioSolicitud({ onExito }: FormularioSolicitudProps) {
-  const [formulario, setFormulario] = useState<CrearSolicitudDto>({
+  const [formulario, setFormulario] = useState({
     nombre: '',
     email: '',
     telefono: '',
@@ -19,6 +26,7 @@ export function FormularioSolicitud({ onExito }: FormularioSolicitudProps) {
   });
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [erroresValidacion, setErroresValidacion] = useState<ErroresValidacion>({});
   const [exito, setExito] = useState(false);
 
   const handleChange = (
@@ -26,15 +34,64 @@ export function FormularioSolicitud({ onExito }: FormularioSolicitudProps) {
   ) => {
     const { name, value } = e.target;
     setFormulario((prev) => ({ ...prev, [name]: value }));
+    // Limpiar error de validación al escribir
+    if (erroresValidacion[name as keyof ErroresValidacion]) {
+      setErroresValidacion((prev) => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  const validarFormulario = (): boolean => {
+    const errores: ErroresValidacion = {};
+
+    if (formulario.nombre.trim().length < 2) {
+      errores.nombre = 'El nombre debe tener al menos 2 caracteres';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formulario.email)) {
+      errores.email = 'Ingresa un correo electrónico válido';
+    }
+
+    if (formulario.telefono.trim().length < 8) {
+      errores.telefono = 'El teléfono debe tener al menos 8 caracteres';
+    }
+
+    if (formulario.mensaje.trim().length < 10) {
+      errores.mensaje = 'El mensaje debe tener al menos 10 caracteres';
+    }
+
+    setErroresValidacion(errores);
+    return Object.keys(errores).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setEnviando(true);
     setError(null);
 
+    if (!validarFormulario()) {
+      return;
+    }
+
+    setEnviando(true);
+
     try {
-      await asociadosServicio.crearSolicitud(formulario);
+      // Preparar datos limpiando campos opcionales vacíos
+      const datosEnvio: CrearSolicitudDto = {
+        nombre: formulario.nombre.trim(),
+        email: formulario.email.trim(),
+        telefono: formulario.telefono.trim(),
+        mensaje: formulario.mensaje.trim(),
+      };
+
+      // Solo incluir campos opcionales si tienen valor
+      if (formulario.empresa.trim()) {
+        datosEnvio.empresa = formulario.empresa.trim();
+      }
+      if (formulario.cargo.trim()) {
+        datosEnvio.cargo = formulario.cargo.trim();
+      }
+
+      await asociadosServicio.crearSolicitud(datosEnvio);
       setExito(true);
       setFormulario({
         nombre: '',
@@ -104,9 +161,16 @@ export function FormularioSolicitud({ onExito }: FormularioSolicitudProps) {
             value={formulario.nombre}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 rounded-xl border border-zinc-200 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 outline-none transition-all duration-200"
+            className={`w-full px-4 py-3 rounded-xl border ${
+              erroresValidacion.nombre
+                ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10'
+                : 'border-zinc-200 focus:border-zinc-900 focus:ring-zinc-900/10'
+            } focus:ring-2 outline-none transition-all duration-200`}
             placeholder="Tu nombre"
           />
+          {erroresValidacion.nombre && (
+            <p className="mt-1 text-sm text-red-600">{erroresValidacion.nombre}</p>
+          )}
         </div>
 
         <div>
@@ -123,9 +187,16 @@ export function FormularioSolicitud({ onExito }: FormularioSolicitudProps) {
             value={formulario.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 rounded-xl border border-zinc-200 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 outline-none transition-all duration-200"
+            className={`w-full px-4 py-3 rounded-xl border ${
+              erroresValidacion.email
+                ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10'
+                : 'border-zinc-200 focus:border-zinc-900 focus:ring-zinc-900/10'
+            } focus:ring-2 outline-none transition-all duration-200`}
             placeholder="correo@ejemplo.com"
           />
+          {erroresValidacion.email && (
+            <p className="mt-1 text-sm text-red-600">{erroresValidacion.email}</p>
+          )}
         </div>
 
         <div>
@@ -142,9 +213,16 @@ export function FormularioSolicitud({ onExito }: FormularioSolicitudProps) {
             value={formulario.telefono}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 rounded-xl border border-zinc-200 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 outline-none transition-all duration-200"
+            className={`w-full px-4 py-3 rounded-xl border ${
+              erroresValidacion.telefono
+                ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10'
+                : 'border-zinc-200 focus:border-zinc-900 focus:ring-zinc-900/10'
+            } focus:ring-2 outline-none transition-all duration-200`}
             placeholder="+502 1234 5678"
           />
+          {erroresValidacion.telefono && (
+            <p className="mt-1 text-sm text-red-600">{erroresValidacion.telefono}</p>
+          )}
         </div>
 
         <div>
@@ -186,7 +264,7 @@ export function FormularioSolicitud({ onExito }: FormularioSolicitudProps) {
           htmlFor="mensaje"
           className="block text-sm font-medium text-zinc-700 mb-2"
         >
-          Mensaje *
+          Mensaje * <span className="text-zinc-400 font-normal">(mínimo 10 caracteres)</span>
         </label>
         <textarea
           id="mensaje"
@@ -195,9 +273,16 @@ export function FormularioSolicitud({ onExito }: FormularioSolicitudProps) {
           onChange={handleChange}
           required
           rows={4}
-          className="w-full px-4 py-3 rounded-xl border border-zinc-200 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 outline-none transition-all duration-200 resize-none"
+          className={`w-full px-4 py-3 rounded-xl border ${
+            erroresValidacion.mensaje
+              ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10'
+              : 'border-zinc-200 focus:border-zinc-900 focus:ring-zinc-900/10'
+          } focus:ring-2 outline-none transition-all duration-200 resize-none`}
           placeholder="Cuéntanos por qué te gustaría ser asociado y cómo podríamos colaborar juntos..."
         />
+        {erroresValidacion.mensaje && (
+          <p className="mt-1 text-sm text-red-600">{erroresValidacion.mensaje}</p>
+        )}
       </div>
 
       <button

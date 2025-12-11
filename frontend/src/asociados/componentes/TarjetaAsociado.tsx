@@ -90,8 +90,11 @@ export function TarjetaAsociado({ asociado }: TarjetaAsociadoProps) {
 
         {/* Badge destacado */}
         {asociado.destacado && (
-          <div className="absolute top-4 right-4 px-3 py-1 bg-amber-500 text-white text-xs font-semibold rounded-full shadow-lg">
-            Destacado
+          <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold rounded-full shadow-lg backdrop-blur-sm">
+            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+            </svg>
+            Premium
           </div>
         )}
       </div>

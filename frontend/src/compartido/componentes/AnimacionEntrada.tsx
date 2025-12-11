@@ -17,7 +17,7 @@ export function AnimacionEntrada({
 }: AnimacionEntradaProps) {
   const [estaVisible, setEstaVisible] = useState(false);
   const elementoRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
