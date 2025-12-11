@@ -5,6 +5,7 @@ import { CompartidoModule } from './compartido/compartido.module';
 import { AutenticacionModule } from './autenticacion/autenticacion.module';
 import { OrdenesModule } from './ordenes/ordenes.module';
 import { PagosModule } from './pagos/pagos.module';
+import { AsociadosModule } from './asociados/asociados.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PagosModule } from './pagos/pagos.module';
     AutenticacionModule,
     OrdenesModule,
     PagosModule,
+    AsociadosModule,
 
     // Módulo compartido
     CompartidoModule,

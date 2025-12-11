@@ -95,11 +95,11 @@ export default function AdminDashboard() {
       color: 'bg-purple-500 hover:bg-purple-600',
     },
     {
-      titulo: 'Roles y Permisos',
-      descripcion: 'Gestionar roles y permisos',
-      icono: '🔐',
-      href: '/admin/roles',
-      color: 'bg-orange-500 hover:bg-orange-600',
+      titulo: 'Gestionar Asociados',
+      descripcion: 'Administrar asociados y solicitudes',
+      icono: '🤝',
+      href: '/admin/asociados',
+      color: 'bg-teal-500 hover:bg-teal-600',
     },
   ];
 

@@ -247,3 +247,51 @@ model ItemOrden {
   @@index([productoId])
   @@map("items_orden")
 }
+
+// ============================================
+// MODELO: Asociado
+// ============================================
+model Asociado {
+  id                  String   @id @default(uuid())
+  nombre              String   @db.VarChar(200)
+  cargo               String   @db.VarChar(100)
+  empresa             String?  @db.VarChar(200)
+  descripcion         String?  @db.Text
+  foto                String?  @db.VarChar(500)
+  linkedin            String?  @db.VarChar(255)
+  twitter             String?  @db.VarChar(255)
+  sitioWeb            String?  @db.VarChar(255) @map("sitio_web")
+  orden               Int      @default(0)
+  activo              Boolean  @default(true)
+  destacado           Boolean  @default(false)
+  fechaIngreso        DateTime @default(now()) @map("fecha_ingreso")
+  fechaCreacion       DateTime @default(now()) @map("fecha_creacion")
+  fechaActualizacion  DateTime @updatedAt @map("fecha_actualizacion")
+
+  @@index([activo, orden])
+  @@index([destacado])
+  @@map("asociados")
+}
+
+// ============================================
+// MODELO: Solicitud de Asociado
+// ============================================
+model SolicitudAsociado {
+  id                  String   @id @default(uuid())
+  nombre              String   @db.VarChar(200)
+  email               String   @db.VarChar(255)
+  telefono            String   @db.VarChar(20)
+  empresa             String?  @db.VarChar(200)
+  cargo               String?  @db.VarChar(100)
+  mensaje             String   @db.Text
+  estado              String   @default("pendiente") @db.VarChar(50) // pendiente, revisando, aprobada, rechazada
+  notasAdmin          String?  @db.Text @map("notas_admin")
+  leida               Boolean  @default(false)
+  fechaCreacion       DateTime @default(now()) @map("fecha_creacion")
+  fechaActualizacion  DateTime @updatedAt @map("fecha_actualizacion")
+
+  @@index([estado])
+  @@index([leida])
+  @@index([fechaCreacion])
+  @@map("solicitudes_asociado")
+}

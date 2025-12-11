@@ -29,8 +29,11 @@ export class GuardRoles implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const usuario = request.user;
 
-    // Verifica si el usuario tiene uno de los roles requeridos
-    if (!usuario || !rolesRequeridos.includes(usuario.rol)) {
+    // Verifica si el usuario tiene uno de los roles requeridos (case-insensitive)
+    const rolUsuario = usuario?.rol?.toLowerCase();
+    const rolesLower = rolesRequeridos.map((r) => r.toLowerCase());
+
+    if (!usuario || !rolUsuario || !rolesLower.includes(rolUsuario)) {
       throw new ForbiddenException(
         'No tienes permisos para acceder a este recurso',
       );
