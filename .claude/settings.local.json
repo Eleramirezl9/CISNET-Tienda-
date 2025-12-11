@@ -9,7 +9,10 @@
       "Bash(findstr:*)",
       "Bash(ls:*)",
       "Bash(dir:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(copy \"c:\\Users\\MARLON\\Desktop\\Tienda\\Mascota_de_cisnet-removebg-preview.png\" \"c:\\Users\\MARLON\\Desktop\\Tienda\\frontend\\public\\mascota-cisnet.png\")",
+      "Bash(cp:*)",
+      "Bash(npx next build:*)"
     ],
     "deny": [],
     "ask": []

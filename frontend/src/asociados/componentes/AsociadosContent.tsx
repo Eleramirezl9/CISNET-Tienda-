@@ -167,11 +167,11 @@ export function AsociadosContent() {
         <section id="asociados" className="max-w-7xl mx-auto px-8 py-24">
           <AnimacionEntrada>
             <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-full border border-amber-200/60 shadow-sm mb-6">
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full border border-amber-300/60 shadow-sm mb-6">
                 <svg className="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
                 </svg>
-                <span className="text-sm font-semibold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent">
+                <span className="text-sm font-semibold text-amber-700">
                   Colaboradores Premium
                 </span>
               </div>
@@ -270,11 +270,11 @@ export function AsociadosContent() {
       <section className="max-w-7xl mx-auto px-8 py-24">
         <AnimacionEntrada>
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-full border border-emerald-200/60 shadow-sm mb-6">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-full border border-emerald-300/60 shadow-sm mb-6">
               <svg className="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                <polyline points="20 6 9 17 4 12" />
               </svg>
-              <span className="text-sm font-semibold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold text-emerald-700">
                 Ventajas Exclusivas
               </span>
             </div>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { InitAuth } from './init-auth';
 import { Navbar } from '@/compartido/componentes/navbar';
+import { MascotaCisnet } from '@/compartido/componentes/MascotaCisnet';
 import { Toaster } from '@/compartido/ui';
 import './globals.css';
 
@@ -28,6 +29,7 @@ export default function RootLayout({
         <InitAuth>
           <Navbar />
           {children}
+          <MascotaCisnet />
           <Toaster />
         </InitAuth>
       </body>
