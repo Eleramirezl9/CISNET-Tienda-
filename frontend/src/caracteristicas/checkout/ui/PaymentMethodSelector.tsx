@@ -50,9 +50,9 @@ const METODOS_PAGO: PaymentMethod[] = [
   {
     id: MetodoPago.TARJETA_INTERNACIONAL,
     nombre: 'Tarjeta Internacional',
-    descripcion: 'Stripe / USD',
+    descripcion: 'Pago seguro con Stripe (USD)',
     icon: Globe,
-    disponible: false,
+    disponible: true,
   },
 ];
 

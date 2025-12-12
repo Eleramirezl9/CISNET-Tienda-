@@ -12,7 +12,11 @@
       "Bash(npm run build:*)",
       "Bash(copy \"c:\\Users\\MARLON\\Desktop\\Tienda\\Mascota_de_cisnet-removebg-preview.png\" \"c:\\Users\\MARLON\\Desktop\\Tienda\\frontend\\public\\mascota-cisnet.png\")",
       "Bash(cp:*)",
-      "Bash(npx next build:*)"
+      "Bash(npx next build:*)",
+      "Bash(find:*)",
+      "Bash(pnpm add:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

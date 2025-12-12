@@ -21,6 +21,7 @@ import { PaymentMethodSelector } from '@/caracteristicas/checkout/ui/PaymentMeth
 import { ResumenOrden } from '@/caracteristicas/checkout/ui/ResumenOrden';
 import { PayPalButtonManual } from '@/caracteristicas/checkout/ui/PayPalButtonManual';
 import { RecurrenteButton } from '@/caracteristicas/checkout/ui/RecurrenteButton';
+import { StripeButton } from '@/caracteristicas/checkout/ui/StripeButton';
 import { useCarrito } from '@/caracteristicas/carrito-compras';
 import {
   Input,
@@ -34,6 +35,7 @@ import {
 } from '@/compartido/ui';
 import { ArrowLeft, Loader2, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
+import { convertirGTQaUSD } from '@/compartido/lib/formatters';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -77,8 +79,12 @@ export default function CheckoutPage() {
   const onSubmit = (data: CheckoutFormData) => {
     setError(null);
 
-    // Si es PayPal o Recurrente, solo validar el formulario y mostrar el botón
-    if (data.metodoPago === MetodoPago.PAYPAL || data.metodoPago === MetodoPago.RECURRENTE) {
+    // Si es PayPal, Recurrente o Stripe, solo validar el formulario y mostrar el botón
+    if (
+      data.metodoPago === MetodoPago.PAYPAL ||
+      data.metodoPago === MetodoPago.RECURRENTE ||
+      data.metodoPago === MetodoPago.TARJETA_INTERNACIONAL
+    ) {
       setMostrarPayPal(true);
       return;
     }
@@ -525,6 +531,49 @@ export default function CheckoutPage() {
                       />
                     )}
                   </div>
+                ) : mostrarPayPal && metodoPago === MetodoPago.TARJETA_INTERNACIONAL ? (
+                  <div className="bg-white rounded-lg border border-zinc-200 p-6">
+                    <h3 className="text-lg font-semibold text-zinc-900 mb-4">
+                      Completa tu pago con Stripe
+                    </h3>
+                    {!ordenCreada ? (
+                      <Button
+                        onClick={crearOrdenYMostrarPayPal}
+                        size="lg"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700"
+                        disabled={isPending}
+                      >
+                        {isPending ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                            Creando orden...
+                          </>
+                        ) : (
+                          'Continuar con Stripe'
+                        )}
+                      </Button>
+                    ) : (
+                      <StripeButton
+                        numeroOrden={ordenCreada}
+                        monto={convertirGTQaUSD(total)}
+                        moneda="USD"
+                        onSuccess={() => {
+                          toast.success('¡Pago completado con Stripe!', {
+                            description: 'Tu pedido ha sido confirmado y procesado.',
+                            duration: 5000,
+                          });
+                          limpiarCarrito();
+                          router.push(`/checkout/confirmacion?orden=${ordenCreada}`);
+                        }}
+                        onError={(error) => {
+                          toast.error('Error en el pago', {
+                            description: 'No se pudo procesar el pago con Stripe. Intenta nuevamente.',
+                          });
+                          setError('Error al procesar el pago con Stripe');
+                        }}
+                      />
+                    )}
+                  </div>
                 ) : (
                   <Button
                     type="submit"
@@ -621,6 +670,49 @@ export default function CheckoutPage() {
                               description: 'No se pudo procesar el pago. Intenta nuevamente.',
                             });
                             setError('Error al procesar el pago con Recurrente');
+                          }}
+                        />
+                      )}
+                    </div>
+                  ) : mostrarPayPal && metodoPago === MetodoPago.TARJETA_INTERNACIONAL ? (
+                    <div className="bg-white rounded-lg border border-zinc-200 p-6">
+                      <h3 className="text-lg font-semibold text-zinc-900 mb-4">
+                        Completa tu pago con Stripe
+                      </h3>
+                      {!ordenCreada ? (
+                        <Button
+                          onClick={crearOrdenYMostrarPayPal}
+                          size="lg"
+                          className="w-full bg-indigo-600 hover:bg-indigo-700"
+                          disabled={isPending}
+                        >
+                          {isPending ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                              Creando orden...
+                            </>
+                          ) : (
+                            'Continuar con Stripe'
+                          )}
+                        </Button>
+                      ) : (
+                        <StripeButton
+                          numeroOrden={ordenCreada}
+                          monto={convertirGTQaUSD(total)}
+                          moneda="USD"
+                          onSuccess={() => {
+                            toast.success('¡Pago completado con Stripe!', {
+                              description: 'Tu pedido ha sido confirmado y procesado.',
+                              duration: 5000,
+                            });
+                            limpiarCarrito();
+                            router.push(`/checkout/confirmacion?orden=${ordenCreada}`);
+                          }}
+                          onError={(error) => {
+                            toast.error('Error en el pago', {
+                              description: 'No se pudo procesar el pago con Stripe. Intenta nuevamente.',
+                            });
+                            setError('Error al procesar el pago con Stripe');
                           }}
                         />
                       )}

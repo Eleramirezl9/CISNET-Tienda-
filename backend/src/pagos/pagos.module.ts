@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PagosController } from './infraestructura/http/pagos.controller';
 import { PayPalService } from './infraestructura/paypal/paypal.service';
 import { RecurrenteService } from './infraestructura/recurrente/recurrente.service';
+import { StripeService } from './infraestructura/stripe/stripe.service';
 import { BuscarOrdenPorNumeroUseCase } from '@/ordenes/aplicacion/casos-uso/buscar-orden-por-numero.use-case';
 import { ActualizarEstadoOrdenUseCase } from '@/ordenes/aplicacion/casos-uso/actualizar-estado-orden.use-case';
 import { CompartidoModule } from '@/compartido/compartido.module';
@@ -19,9 +20,10 @@ import { CompartidoModule } from '@/compartido/compartido.module';
   providers: [
     PayPalService,
     RecurrenteService,
+    StripeService,
     BuscarOrdenPorNumeroUseCase,
     ActualizarEstadoOrdenUseCase,
   ],
-  exports: [PayPalService, RecurrenteService],
+  exports: [PayPalService, RecurrenteService, StripeService],
 })
 export class PagosModule {}

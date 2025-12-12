@@ -11,13 +11,16 @@ import Link from 'next/link';
 import { CheckCircle, Home, Package, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/compartido/ui';
 import { obtenerOrden, type OrdenDetalle } from '@/caracteristicas/checkout/acciones/obtener-orden.action';
+import { useCarrito } from '@/caracteristicas/carrito-compras/aplicacion/useCarrito';
 
 function ConfirmacionContent() {
   const searchParams = useSearchParams();
   const numeroOrden = searchParams.get('orden');
+  const sessionId = searchParams.get('session_id'); // Para Stripe
   const [orden, setOrden] = useState<OrdenDetalle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const limpiarCarrito = useCarrito((state) => state.limpiarCarrito);
 
   useEffect(() => {
     async function cargarOrden() {
@@ -27,10 +30,31 @@ function ConfirmacionContent() {
         return;
       }
 
+      // Si viene de Stripe, verificar el pago primero y esperar confirmación
+      if (sessionId) {
+        try {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+          const response = await fetch(`${apiUrl}/pagos/stripe/verificar/${sessionId}`, {
+            method: 'POST',
+          });
+
+          if (!response.ok) {
+            console.warn(`Error verificando pago Stripe: ${response.status}`);
+          }
+        } catch (err) {
+          // Log solo en desarrollo
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error al verificar pago de Stripe:', err);
+          }
+        }
+      }
+
       const resultado = await obtenerOrden(numeroOrden);
 
       if (resultado.success && resultado.data) {
         setOrden(resultado.data);
+        // Limpiar el carrito cuando la orden se carga exitosamente
+        limpiarCarrito();
       } else {
         setError(resultado.error || 'Error al cargar la orden');
       }
@@ -39,7 +63,7 @@ function ConfirmacionContent() {
     }
 
     cargarOrden();
-  }, [numeroOrden]);
+  }, [numeroOrden, sessionId, limpiarCarrito]);
 
   if (loading) {
     return (

@@ -62,3 +62,37 @@ export function truncate(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength).trim() + '...';
 }
+
+/**
+ * Obtiene el tipo de cambio GTQ a USD desde las variables de entorno
+ */
+export function obtenerTipoCambio(): number {
+  return Number(process.env.NEXT_PUBLIC_EXCHANGE_RATE_GTQ_TO_USD || 7.80);
+}
+
+/**
+ * Convierte un monto de GTQ a USD
+ */
+export function convertirGTQaUSD(montoGTQ: number): number {
+  const tipoCambio = obtenerTipoCambio();
+  return Number((montoGTQ / tipoCambio).toFixed(2));
+}
+
+/**
+ * Convierte un monto de USD a GTQ
+ */
+export function convertirUSDaGTQ(montoUSD: number): number {
+  const tipoCambio = obtenerTipoCambio();
+  return Number((montoUSD * tipoCambio).toFixed(2));
+}
+
+/**
+ * Formatea un número como moneda en USD
+ */
+export function formatCurrencyUSD(amount: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format(amount);
+}

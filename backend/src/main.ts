@@ -6,7 +6,10 @@ import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    // Habilitar rawBody para webhooks de Stripe
+    rawBody: true,
+  });
 
   // Seguridad: Helmet (protección de headers HTTP)
   app.use(helmet() as any);

@@ -212,6 +212,10 @@ model Orden {
   recurrenteCheckoutId     String?  @map("recurrente_checkout_id") @db.VarChar(255)
   recurrenteTransactionId  String?  @map("recurrente_transaction_id") @db.VarChar(255)
 
+  // Información de pago (Stripe)
+  stripeSessionId          String?  @map("stripe_session_id") @db.VarChar(255)
+  stripePaymentIntentId    String?  @map("stripe_payment_intent_id") @db.VarChar(255)
+
   estadoPago          String   @default("pendiente") @db.VarChar(50) @map("estado_pago") // pendiente, completado, fallido
 
   // Timestamps

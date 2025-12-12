@@ -15,7 +15,10 @@ import {
   NotFoundException,
   Headers,
   Logger,
+  RawBodyRequest,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -24,11 +27,35 @@ import {
 } from '@nestjs/swagger';
 import { PayPalService } from '@/pagos/infraestructura/paypal/paypal.service';
 import { RecurrenteService } from '@/pagos/infraestructura/recurrente/recurrente.service';
+import { StripeService } from '@/pagos/infraestructura/stripe/stripe.service';
 import { BuscarOrdenPorNumeroUseCase } from '@/ordenes/aplicacion/casos-uso/buscar-orden-por-numero.use-case';
 import { ActualizarEstadoOrdenUseCase } from '@/ordenes/aplicacion/casos-uso/actualizar-estado-orden.use-case';
 import { ConfigService } from '@nestjs/config';
 import { EstadoOrden } from '@/ordenes/dominio/entidades/orden.entidad';
 import { PrismaService } from '@/compartido/infraestructura/prisma/prisma.service';
+
+/**
+ * Interfaz para el payload del webhook de Recurrente
+ */
+interface RecurrenteWebhookPayload {
+  id: string;
+  event_type:
+    | 'payment_intent.succeeded'
+    | 'payment.succeeded'
+    | 'payment_intent.failed'
+    | 'payment.failed'
+    | 'payment_intent.canceled'
+    | 'payment.canceled';
+  failure_reason?: string;
+  products?: Array<{
+    metadata?: {
+      numeroOrden?: string;
+    };
+  }>;
+  checkout?: {
+    id: string;
+  };
+}
 
 @ApiTags('pagos')
 @Controller('pagos')
@@ -38,6 +65,7 @@ export class PagosController {
   constructor(
     private readonly paypalService: PayPalService,
     private readonly recurrenteService: RecurrenteService,
+    private readonly stripeService: StripeService,
     private readonly buscarOrdenPorNumero: BuscarOrdenPorNumeroUseCase,
     private readonly actualizarEstadoOrden: ActualizarEstadoOrdenUseCase,
     private readonly configService: ConfigService,
@@ -307,7 +335,7 @@ export class PagosController {
   @Post('recurrente/webhook')
   @HttpCode(HttpStatus.OK)
   async webhookRecurrente(
-    @Body() payload: any,
+    @Body() payload: RecurrenteWebhookPayload,
     @Headers('x-signature') signature: string,
   ) {
     this.logger.log(`Webhook Recurrente recibido: ${payload.event_type}`);
@@ -397,6 +425,227 @@ export class PagosController {
 
       default:
         this.logger.log(`Evento no manejado: ${payload.event_type}`);
+    }
+
+    return { received: true };
+  }
+
+  // ==========================================
+  // STRIPE - Endpoints
+  // ==========================================
+
+  @Post('stripe/crear-checkout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Crear checkout de Stripe',
+    description: 'Crea una sesión de pago con Stripe para tarjetas internacionales',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Checkout de Stripe creado exitosamente',
+    schema: {
+      example: {
+        sessionId: 'cs_test_xxx',
+        checkoutUrl: 'https://checkout.stripe.com/xxx',
+        estado: 'unpaid',
+      },
+    },
+  })
+  async crearCheckoutStripe(
+    @Body() datos: { numeroOrden: string; monto: number; moneda?: string },
+  ) {
+    // 1. Validar que la orden exista
+    const ordenBD = await this.buscarOrdenPorNumero.ejecutar(datos.numeroOrden);
+
+    // 2. Validar monto (convertir a USD si es necesario)
+    const tipoCambio = Number(
+      this.configService.get('EXCHANGE_RATE_GTQ_TO_USD', '7.80'),
+    );
+
+    const montoUSD = Number((ordenBD.total / tipoCambio).toFixed(2));
+    const diferencia = Math.abs(datos.monto - montoUSD);
+
+    if (diferencia > 0.02) {
+      throw new BadRequestException(
+        `El monto no coincide con la orden. Esperado: $${montoUSD} USD, Recibido: $${datos.monto} USD`,
+      );
+    }
+
+    // 3. Crear checkout en Stripe
+    const checkout = await this.stripeService.crearCheckout({
+      monto: montoUSD,
+      moneda: 'usd',
+      numeroOrden: datos.numeroOrden,
+      descripcion: `Orden ${datos.numeroOrden} - Tienda E-commerce`,
+    });
+
+    // 4. Guardar session ID en la BD
+    await this.prisma.orden.update({
+      where: { numeroOrden: datos.numeroOrden },
+      data: {
+        stripeSessionId: checkout.id,
+      },
+    });
+
+    return {
+      sessionId: checkout.id,
+      checkoutUrl: checkout.url,
+      estado: checkout.estado,
+    };
+  }
+
+  @Post('stripe/verificar/:sessionId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Verificar pago de Stripe',
+    description: 'Verifica el estado de una sesión de checkout de Stripe',
+  })
+  async verificarPagoStripe(@Param('sessionId') sessionId: string) {
+    if (!sessionId) {
+      throw new BadRequestException('El ID de sesión es requerido');
+    }
+
+    try {
+      // 1. Obtener detalles de la sesión
+      const session = await this.stripeService.obtenerSesion(sessionId);
+
+      // 2. Buscar la orden asociada
+      const ordenBD = await this.prisma.orden.findFirst({
+        where: { stripeSessionId: sessionId },
+      });
+
+      if (!ordenBD) {
+        throw new NotFoundException(
+          'No se encontró una orden asociada a esta sesión de Stripe',
+        );
+      }
+
+      // 3. Si el pago fue exitoso, actualizar la orden
+      if (session.payment_status === 'paid') {
+        const paymentIntentId =
+          typeof session.payment_intent === 'string'
+            ? session.payment_intent
+            : session.payment_intent?.id;
+
+        await this.prisma.orden.update({
+          where: { numeroOrden: ordenBD.numeroOrden },
+          data: {
+            stripePaymentIntentId: paymentIntentId || null,
+            estadoPago: 'COMPLETADO',
+            estado: EstadoOrden.CONFIRMADA,
+            fechaActualizacion: new Date(),
+          },
+        });
+
+        this.logger.log(`Pago Stripe confirmado para orden ${ordenBD.numeroOrden}`);
+      }
+
+      return {
+        sessionId: session.id,
+        paymentStatus: session.payment_status,
+        numeroOrden: ordenBD.numeroOrden,
+        estado: ordenBD.estado,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(
+        'No se pudo verificar el estado del pago',
+      );
+    }
+  }
+
+  @Post('stripe/webhook')
+  @HttpCode(HttpStatus.OK)
+  async webhookStripe(
+    @Req() req: RawBodyRequest<Request>,
+    @Headers('stripe-signature') signature: string,
+  ) {
+    this.logger.log('Webhook de Stripe recibido');
+
+    // Obtener el raw body para validar la firma de Stripe
+    const rawBody = req.rawBody;
+
+    if (!rawBody) {
+      this.logger.error('Raw body no disponible para validación de webhook');
+      throw new BadRequestException('Raw body requerido para webhook');
+    }
+
+    // 1. Validar la firma del webhook
+    const event = this.stripeService.validarWebhookSignature(rawBody, signature);
+
+    if (!event) {
+      this.logger.warn('Firma de webhook de Stripe inválida');
+      throw new BadRequestException('Firma de webhook inválida');
+    }
+
+    this.logger.log(`Evento de Stripe: ${event.type}`);
+
+    // 2. Procesar el evento
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        const numeroOrden = session.metadata?.numeroOrden;
+
+        if (!numeroOrden) {
+          this.logger.warn(
+            `Webhook checkout.session.completed sin numeroOrden en metadata. Session ID: ${session.id}`,
+          );
+          break;
+        }
+
+        const paymentIntentId =
+          typeof session.payment_intent === 'string'
+            ? session.payment_intent
+            : null;
+
+        try {
+          await this.prisma.orden.update({
+            where: { numeroOrden },
+            data: {
+              stripePaymentIntentId: paymentIntentId,
+              estadoPago: 'COMPLETADO',
+              estado: EstadoOrden.CONFIRMADA,
+              fechaActualizacion: new Date(),
+            },
+          });
+
+          this.logger.log(`Pago Stripe completado para orden ${numeroOrden}`);
+        } catch (error) {
+          this.logger.error(
+            `Error actualizando orden ${numeroOrden}: ${error instanceof Error ? error.message : error}`,
+          );
+        }
+        break;
+      }
+
+      case 'payment_intent.payment_failed': {
+        const paymentIntent = event.data.object;
+        const sessionId = paymentIntent.metadata?.sessionId;
+
+        if (sessionId) {
+          const ordenBD = await this.prisma.orden.findFirst({
+            where: { stripeSessionId: sessionId },
+          });
+
+          if (ordenBD) {
+            await this.prisma.orden.update({
+              where: { numeroOrden: ordenBD.numeroOrden },
+              data: {
+                estadoPago: 'FALLIDO',
+                fechaActualizacion: new Date(),
+              },
+            });
+
+            this.logger.log(`Pago Stripe fallido para orden ${ordenBD.numeroOrden}`);
+          }
+        }
+        break;
+      }
+
+      default:
+        this.logger.log(`Evento de Stripe no manejado: ${event.type}`);
     }
 
     return { received: true };
