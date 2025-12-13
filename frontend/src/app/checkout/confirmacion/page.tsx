@@ -198,19 +198,19 @@ function ConfirmacionContent() {
           <h2 className="font-semibold text-zinc-900 mb-4">¿Qué sigue?</h2>
           <ul className="space-y-3 text-sm text-zinc-600">
             <li className="flex items-start gap-3">
-              <Package className="w-5 h-5 text-zinc-400 flex-shrink-0 mt-0.5" />
+              <Package className="w-5 h-5 text-zinc-400 shrink-0 mt-0.5" />
               <span>
                 Recibirás una llamada para confirmar tu pedido en las próximas 2 horas
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <Package className="w-5 h-5 text-zinc-400 flex-shrink-0 mt-0.5" />
+              <Package className="w-5 h-5 text-zinc-400 shrink-0 mt-0.5" />
               <span>
                 Tu pedido será preparado y despachado dentro de 24-48 horas
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <Package className="w-5 h-5 text-zinc-400 flex-shrink-0 mt-0.5" />
+              <Package className="w-5 h-5 text-zinc-400 shrink-0 mt-0.5" />
               <span>
                 Recibirás tu pedido en la dirección proporcionada
               </span>

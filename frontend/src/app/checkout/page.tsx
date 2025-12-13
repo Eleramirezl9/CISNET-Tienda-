@@ -249,8 +249,8 @@ export default function CheckoutPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-32 lg:pb-12">
+        <form id="checkout-form" onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Columna Izquierda - Formulario (2/3) */}
             <div className="lg:col-span-2 space-y-8">
@@ -456,147 +456,11 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Botón de submit / PayPal (móvil) */}
-              <div className="lg:hidden">
-                {mostrarPayPal && metodoPago === MetodoPago.PAYPAL ? (
-                  <div className="bg-white rounded-lg border border-zinc-200 p-6">
-                    <h3 className="text-lg font-semibold text-zinc-900 mb-4">
-                      Completa tu pago con PayPal
-                    </h3>
-                    {!ordenCreada ? (
-                      <Button
-                        onClick={crearOrdenYMostrarPayPal}
-                        size="lg"
-                        className="w-full"
-                        disabled={isPending}
-                      >
-                        {isPending ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                            Creando orden...
-                          </>
-                        ) : (
-                          'Continuar con PayPal'
-                        )}
-                      </Button>
-                    ) : (
-                      <PayPalButtonManual
-                        numeroOrden={ordenCreada}
-                        monto={total}
-                        onApprove={handlePayPalSuccess}
-                        onError={handlePayPalError}
-                      />
-                    )}
-                  </div>
-                ) : mostrarPayPal && metodoPago === MetodoPago.RECURRENTE ? (
-                  <div className="bg-white rounded-lg border border-zinc-200 p-6">
-                    <h3 className="text-lg font-semibold text-zinc-900 mb-4">
-                      Completa tu pago con Tarjeta
-                    </h3>
-                    {!ordenCreada ? (
-                      <Button
-                        onClick={crearOrdenYMostrarPayPal}
-                        size="lg"
-                        className="w-full"
-                        disabled={isPending}
-                      >
-                        {isPending ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                            Creando orden...
-                          </>
-                        ) : (
-                          'Continuar con Tarjeta'
-                        )}
-                      </Button>
-                    ) : (
-                      <RecurrenteButton
-                        numeroOrden={ordenCreada}
-                        monto={total}
-                        moneda="GTQ"
-                        onSuccess={() => {
-                          toast.success('¡Pago completado con tarjeta!', {
-                            description: 'Tu pedido ha sido confirmado y procesado.',
-                            duration: 5000,
-                          });
-                          limpiarCarrito();
-                          router.push(`/checkout/confirmacion?orden=${ordenCreada}`);
-                        }}
-                        onError={(error) => {
-                          toast.error('Error en el pago', {
-                            description: 'No se pudo procesar el pago. Intenta nuevamente.',
-                          });
-                          setError('Error al procesar el pago con Recurrente');
-                        }}
-                      />
-                    )}
-                  </div>
-                ) : mostrarPayPal && metodoPago === MetodoPago.TARJETA_INTERNACIONAL ? (
-                  <div className="bg-white rounded-lg border border-zinc-200 p-6">
-                    <h3 className="text-lg font-semibold text-zinc-900 mb-4">
-                      Completa tu pago con Stripe
-                    </h3>
-                    {!ordenCreada ? (
-                      <Button
-                        onClick={crearOrdenYMostrarPayPal}
-                        size="lg"
-                        className="w-full bg-indigo-600 hover:bg-indigo-700"
-                        disabled={isPending}
-                      >
-                        {isPending ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                            Creando orden...
-                          </>
-                        ) : (
-                          'Continuar con Stripe'
-                        )}
-                      </Button>
-                    ) : (
-                      <StripeButton
-                        numeroOrden={ordenCreada}
-                        monto={convertirGTQaUSD(total)}
-                        moneda="USD"
-                        onSuccess={() => {
-                          toast.success('¡Pago completado con Stripe!', {
-                            description: 'Tu pedido ha sido confirmado y procesado.',
-                            duration: 5000,
-                          });
-                          limpiarCarrito();
-                          router.push(`/checkout/confirmacion?orden=${ordenCreada}`);
-                        }}
-                        onError={(error) => {
-                          toast.error('Error en el pago', {
-                            description: 'No se pudo procesar el pago con Stripe. Intenta nuevamente.',
-                          });
-                          setError('Error al procesar el pago con Stripe');
-                        }}
-                      />
-                    )}
-                  </div>
-                ) : (
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="w-full"
-                    disabled={isPending}
-                  >
-                    {isPending ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                        Procesando pedido...
-                      </>
-                    ) : (
-                      'Confirmar Pedido'
-                    )}
-                  </Button>
-                )}
-              </div>
             </div>
 
             {/* Columna Derecha - Resumen (1/3) */}
             <div className="lg:col-span-1">
-              <div className="space-y-6">
+              <div className="lg:sticky lg:top-6 space-y-6">
                 <ResumenOrden />
 
                 {/* Botón de submit / PayPal (desktop) */}
@@ -739,7 +603,7 @@ export default function CheckoutPage() {
                 {/* Garantías */}
                 <div className="bg-zinc-50 rounded-lg p-6 space-y-4 text-sm">
                   <div className="flex items-start gap-3">
-                    <ShieldCheck className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <ShieldCheck className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium text-zinc-900">
                         Compra Protegida
@@ -754,6 +618,135 @@ export default function CheckoutPage() {
             </div>
           </div>
         </form>
+      </div>
+
+      {/* Barra fija inferior para móviles */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1">
+            <p className="text-xs text-zinc-500">Total</p>
+            <p className="text-lg font-bold text-zinc-900">Q {total.toFixed(2)}</p>
+          </div>
+          {mostrarPayPal ? (
+            metodoPago === MetodoPago.PAYPAL ? (
+              !ordenCreada ? (
+                <Button
+                  onClick={crearOrdenYMostrarPayPal}
+                  size="lg"
+                  className="flex-1"
+                  disabled={isPending}
+                >
+                  {isPending ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    'Pagar con PayPal'
+                  )}
+                </Button>
+              ) : (
+                <div className="flex-1">
+                  <PayPalButtonManual
+                    numeroOrden={ordenCreada}
+                    monto={total}
+                    onApprove={handlePayPalSuccess}
+                    onError={handlePayPalError}
+                  />
+                </div>
+              )
+            ) : metodoPago === MetodoPago.RECURRENTE ? (
+              !ordenCreada ? (
+                <Button
+                  onClick={crearOrdenYMostrarPayPal}
+                  size="lg"
+                  className="flex-1"
+                  disabled={isPending}
+                >
+                  {isPending ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    'Pagar con Tarjeta'
+                  )}
+                </Button>
+              ) : (
+                <div className="flex-1">
+                  <RecurrenteButton
+                    numeroOrden={ordenCreada}
+                    monto={total}
+                    moneda="GTQ"
+                    onSuccess={() => {
+                      toast.success('¡Pago completado!');
+                      limpiarCarrito();
+                      router.push(`/checkout/confirmacion?orden=${ordenCreada}`);
+                    }}
+                    onError={() => {
+                      toast.error('Error en el pago');
+                      setError('Error al procesar el pago');
+                    }}
+                  />
+                </div>
+              )
+            ) : metodoPago === MetodoPago.TARJETA_INTERNACIONAL ? (
+              !ordenCreada ? (
+                <Button
+                  onClick={crearOrdenYMostrarPayPal}
+                  size="lg"
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700"
+                  disabled={isPending}
+                >
+                  {isPending ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    'Pagar con Stripe'
+                  )}
+                </Button>
+              ) : (
+                <div className="flex-1">
+                  <StripeButton
+                    numeroOrden={ordenCreada}
+                    monto={convertirGTQaUSD(total)}
+                    moneda="USD"
+                    onSuccess={() => {
+                      toast.success('¡Pago completado!');
+                      limpiarCarrito();
+                      router.push(`/checkout/confirmacion?orden=${ordenCreada}`);
+                    }}
+                    onError={() => {
+                      toast.error('Error en el pago');
+                      setError('Error al procesar el pago');
+                    }}
+                  />
+                </div>
+              )
+            ) : (
+              <Button
+                type="submit"
+                form="checkout-form"
+                size="lg"
+                className="flex-1"
+                disabled={isPending}
+              >
+                {isPending ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  'Confirmar Pedido'
+                )}
+              </Button>
+            )
+          ) : (
+            <Button
+              type="submit"
+              form="checkout-form"
+              size="lg"
+              className="flex-1"
+              disabled={isPending}
+            >
+              {isPending ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                'Confirmar Pedido'
+              )}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
