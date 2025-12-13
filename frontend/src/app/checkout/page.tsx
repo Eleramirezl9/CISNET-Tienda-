@@ -249,9 +249,9 @@ export default function CheckoutPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-32 lg:pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-32 lg:pb-6">
         <form id="checkout-form" onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Columna Izquierda - Formulario (2/3) */}
             <div className="lg:col-span-2 space-y-8">
               {/* Error global */}
@@ -458,33 +458,31 @@ export default function CheckoutPage() {
 
             </div>
 
-            {/* Columna Derecha - Resumen (1/3) */}
-            <div className="lg:col-span-1">
-              <div className="lg:sticky lg:top-6 space-y-6">
-                <ResumenOrden />
-
-                {/* Botón de submit / PayPal (desktop) */}
-                <div className="hidden lg:block">
-                  {mostrarPayPal && metodoPago === MetodoPago.PAYPAL ? (
-                    <div className="bg-white rounded-lg border border-zinc-200 p-6">
-                      <h3 className="text-lg font-semibold text-zinc-900 mb-4">
-                        Completa tu pago con PayPal
-                      </h3>
-                      {!ordenCreada ? (
+            {/* Columna Derecha - Resumen (1/3) - Solo visible en desktop */}
+            <div className="hidden lg:block lg:col-span-1">
+              <div className="sticky top-20">
+                <ResumenOrden>
+                  {/* Botón de pago integrado con efecto visual */}
+                  <div className="relative">
+                    {mostrarPayPal && metodoPago === MetodoPago.PAYPAL ? (
+                      !ordenCreada ? (
                         <Button
                           onClick={crearOrdenYMostrarPayPal}
                           size="lg"
-                          className="w-full"
+                          className="w-full bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
                           disabled={isPending}
                         >
-                          {isPending ? (
-                            <>
-                              <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                              Creando orden...
-                            </>
-                          ) : (
-                            'Continuar con PayPal'
-                          )}
+                          <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
+                          <span className="relative flex items-center justify-center gap-2">
+                            {isPending ? (
+                              <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Creando orden...
+                              </>
+                            ) : (
+                              'Pagar con PayPal'
+                            )}
+                          </span>
                         </Button>
                       ) : (
                         <PayPalButtonManual
@@ -493,28 +491,26 @@ export default function CheckoutPage() {
                           onApprove={handlePayPalSuccess}
                           onError={handlePayPalError}
                         />
-                      )}
-                    </div>
-                  ) : mostrarPayPal && metodoPago === MetodoPago.RECURRENTE ? (
-                    <div className="bg-white rounded-lg border border-zinc-200 p-6">
-                      <h3 className="text-lg font-semibold text-zinc-900 mb-4">
-                        Completa tu pago con Tarjeta
-                      </h3>
-                      {!ordenCreada ? (
+                      )
+                    ) : mostrarPayPal && metodoPago === MetodoPago.RECURRENTE ? (
+                      !ordenCreada ? (
                         <Button
                           onClick={crearOrdenYMostrarPayPal}
                           size="lg"
-                          className="w-full"
+                          className="w-full bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
                           disabled={isPending}
                         >
-                          {isPending ? (
-                            <>
-                              <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                              Creando orden...
-                            </>
-                          ) : (
-                            'Continuar con Tarjeta'
-                          )}
+                          <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
+                          <span className="relative flex items-center justify-center gap-2">
+                            {isPending ? (
+                              <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Creando orden...
+                              </>
+                            ) : (
+                              'Pagar con Tarjeta'
+                            )}
+                          </span>
                         </Button>
                       ) : (
                         <RecurrenteButton
@@ -522,32 +518,22 @@ export default function CheckoutPage() {
                           monto={total}
                           moneda="GTQ"
                           onSuccess={() => {
-                            toast.success('¡Pago completado con tarjeta!', {
-                              description: 'Tu pedido ha sido confirmado y procesado.',
-                              duration: 5000,
-                            });
+                            toast.success('¡Pago completado!');
                             limpiarCarrito();
                             router.push(`/checkout/confirmacion?orden=${ordenCreada}`);
                           }}
-                          onError={(error) => {
-                            toast.error('Error en el pago', {
-                              description: 'No se pudo procesar el pago. Intenta nuevamente.',
-                            });
-                            setError('Error al procesar el pago con Recurrente');
+                          onError={() => {
+                            toast.error('Error en el pago');
+                            setError('Error al procesar el pago');
                           }}
                         />
-                      )}
-                    </div>
-                  ) : mostrarPayPal && metodoPago === MetodoPago.TARJETA_INTERNACIONAL ? (
-                    <div className="bg-white rounded-lg border border-zinc-200 p-6">
-                      <h3 className="text-lg font-semibold text-zinc-900 mb-4">
-                        Completa tu pago con Stripe
-                      </h3>
-                      {!ordenCreada ? (
+                      )
+                    ) : mostrarPayPal && metodoPago === MetodoPago.TARJETA_INTERNACIONAL ? (
+                      !ordenCreada ? (
                         <Button
                           onClick={crearOrdenYMostrarPayPal}
                           size="lg"
-                          className="w-full bg-indigo-600 hover:bg-indigo-700"
+                          className="w-full bg-indigo-600 hover:bg-indigo-500 shadow-md hover:shadow-lg transition-all duration-200"
                           disabled={isPending}
                         >
                           {isPending ? (
@@ -556,7 +542,7 @@ export default function CheckoutPage() {
                               Creando orden...
                             </>
                           ) : (
-                            'Continuar con Stripe'
+                            'Pagar con Stripe'
                           )}
                         </Button>
                       ) : (
@@ -565,55 +551,44 @@ export default function CheckoutPage() {
                           monto={convertirGTQaUSD(total)}
                           moneda="USD"
                           onSuccess={() => {
-                            toast.success('¡Pago completado con Stripe!', {
-                              description: 'Tu pedido ha sido confirmado y procesado.',
-                              duration: 5000,
-                            });
+                            toast.success('¡Pago completado!');
                             limpiarCarrito();
                             router.push(`/checkout/confirmacion?orden=${ordenCreada}`);
                           }}
-                          onError={(error) => {
-                            toast.error('Error en el pago', {
-                              description: 'No se pudo procesar el pago con Stripe. Intenta nuevamente.',
-                            });
-                            setError('Error al procesar el pago con Stripe');
+                          onError={() => {
+                            toast.error('Error en el pago');
+                            setError('Error al procesar el pago');
                           }}
                         />
-                      )}
-                    </div>
-                  ) : (
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="w-full"
-                      disabled={isPending}
-                    >
-                      {isPending ? (
-                        <>
-                          <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                          Procesando...
-                        </>
-                      ) : (
-                        'Confirmar Pedido'
-                      )}
-                    </Button>
-                  )}
-                </div>
-
-                {/* Garantías */}
-                <div className="bg-zinc-50 rounded-lg p-6 space-y-4 text-sm">
-                  <div className="flex items-start gap-3">
-                    <ShieldCheck className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-zinc-900">
-                        Compra Protegida
-                      </p>
-                      <p className="text-zinc-600 text-xs mt-1">
-                        Tus datos están seguros con encriptación SSL
-                      </p>
-                    </div>
+                      )
+                    ) : (
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                        disabled={isPending}
+                      >
+                        <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
+                        <span className="relative flex items-center justify-center gap-2">
+                          {isPending ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              Procesando...
+                            </>
+                          ) : (
+                            'Confirmar Pedido'
+                          )}
+                        </span>
+                      </Button>
+                    )}
                   </div>
-                </div>
+
+                  {/* Garantía compacta */}
+                  <div className="flex items-center justify-center gap-2 text-xs text-zinc-500 mt-3">
+                    <ShieldCheck className="w-4 h-4 text-green-600" />
+                    <span>Compra segura</span>
+                  </div>
+                </ResumenOrden>
               </div>
             </div>
           </div>
