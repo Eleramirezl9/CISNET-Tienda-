@@ -54,12 +54,12 @@ export function Navbar() {
     : 'bg-blue-100 text-blue-800 border-blue-300';
 
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-slate-200 backdrop-blur-sm bg-white/95">
+    <nav className="sticky top-0 z-50 shadow-sm border-b border-slate-200 backdrop-blur-sm bg-white/95">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo y navegación principal */}
           <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
+            <div className="shrink-0 flex items-center">
               <Link href="/" className="flex items-center gap-2.5 group">
                 <div className="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
                   <span className="text-white font-bold text-base">C</span>
@@ -174,7 +174,7 @@ export function Navbar() {
                 >
                   {/* Avatar con indicador de estado */}
                   <div className="relative">
-                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white font-semibold text-sm">
+                    <div className="h-9 w-9 rounded-full bg-linear-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white font-semibold text-sm">
                       {obtenerIniciales()}
                     </div>
                     {/* Indicador de estado online */}
@@ -209,8 +209,8 @@ export function Navbar() {
                     {/* Cabecera del menú con info del usuario */}
                     <div className="px-4 py-3 border-b border-slate-100">
                       <div className="flex items-center gap-3">
-                        <div className="relative flex-shrink-0">
-                          <div className="h-11 w-11 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white font-bold shadow-sm">
+                        <div className="relative shrink-0">
+                          <div className="h-11 w-11 rounded-full bg-linear-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white font-bold shadow-sm">
                             {obtenerIniciales()}
                           </div>
                           <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white"></div>
@@ -429,10 +429,10 @@ export function Navbar() {
           {estaAutenticado ? (
             <div className="pt-4 pb-3 border-t border-slate-200">
               {/* Cabecera del usuario en móvil */}
-              <div className="px-4 py-3 bg-gradient-to-r from-slate-50 to-slate-100">
+              <div className="px-4 py-3 bg-linear-to-r from-slate-50 to-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0 relative">
-                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white font-semibold shadow-md">
+                  <div className="shrink-0 relative">
+                    <div className="h-12 w-12 rounded-full bg-linear-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white font-semibold shadow-md">
                       {obtenerIniciales()}
                     </div>
                     {/* Indicador de estado online */}

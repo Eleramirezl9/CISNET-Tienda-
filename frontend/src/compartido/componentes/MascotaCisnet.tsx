@@ -108,7 +108,7 @@ export function MascotaCisnet({
           <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white border-r border-b border-zinc-100 transform rotate-45" />
 
           <div className="flex items-start gap-3">
-            <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
+            <div className="shrink-0 w-8 h-8 rounded-full bg-linear-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
               <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
@@ -136,7 +136,7 @@ export function MascotaCisnet({
         aria-label="Asistente virtual Cisney"
       >
         {/* Glow effect */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400/40 to-blue-500/40 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 rounded-full bg-linear-to-br from-cyan-400/40 to-blue-500/40 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         {/* Imagen de la mascota */}
         <div className="relative w-full h-full p-1">
@@ -181,7 +181,7 @@ export function MascotaInline({ className = '' }: { className?: string }) {
         <div
           className={`
             absolute inset-0 rounded-full
-            bg-gradient-to-br from-cyan-400/30 to-blue-500/30
+            bg-linear-to-br from-cyan-400/30 to-blue-500/30
             blur-lg transition-opacity duration-500
             ${hovering ? 'opacity-100' : 'opacity-50'}
           `}
