@@ -16,26 +16,16 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col bg-white">
       {/* Hero Section - Video Background */}
       <main className="flex-1">
-        <section className="relative min-h-screen flex items-center overflow-hidden bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
-          {/* SVG Animated Background */}
-          <div className="absolute inset-0 z-0 opacity-40">
-            <CisnetHeroAnimated />
-          </div>
+        <section className="relative h-screen flex items-center overflow-hidden bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
           {/* Overlay gradiente para elegancia */}
           <div className="absolute inset-0 bg-linear-to-r from-slate-900/85 via-slate-900/70 to-slate-900/50 z-5" />
           <div className="absolute inset-0 bg-linear-to-t from-slate-900/70 via-transparent to-slate-900/40 z-5" />
 
           {/* Contenido */}
-          <div className="relative z-10 max-w-7xl mx-auto px-8 py-32 w-full">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="relative z-10 max-w-7xl mx-auto px-8 py-6 w-full">
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
               {/* Texto */}
               <div className={`transition-all duration-1000 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
-                  <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-                  <span className="text-xs font-medium text-white/90 tracking-wide uppercase">Innovación Tecnológica</span>
-                </div>
-
                 {/* Título */}
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 tracking-tight">
                   Transformamos
@@ -88,19 +78,12 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Mascota decorativa */}
-              <div className={`hidden lg:flex justify-center items-center transition-all duration-1000 delay-300 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
-                <div className="relative">
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 bg-linear-to-br from-cyan-400/30 to-blue-500/30 rounded-full blur-3xl scale-110" />
-                  <Image
-                    src="/mascota-cisnet.png"
-                    alt="Cisney - Mascota de CISNET"
-                    width={400}
-                    height={400}
-                    className="relative drop-shadow-2xl animate-float"
-                    priority
-                  />
+              {/* Background Effects Only - Visible en móvil y desktop */}
+              <div className={`flex justify-center items-center transition-all duration-1000 delay-300 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
+                <div className="relative w-full max-w-md h-96">
+                  <div className="relative h-full">
+                    <CisnetHeroAnimated />
+                  </div>
                 </div>
               </div>
             </div>

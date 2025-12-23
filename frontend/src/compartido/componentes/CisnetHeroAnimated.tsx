@@ -1,369 +1,671 @@
 'use client';
 
+import { useState, useRef } from 'react';
+
+/**
+ * CISNET - Efectos Interactivos de Energía
+ *
+ * Efectos únicos:
+ * - Interacción con mouse (hover)
+ * - Explosiones de partículas al hacer click
+ * - Anillos orbitales reactivos
+ * - Partículas que siguen el cursor
+ */
+
+interface Explosion {
+  id: number;
+  x: number;
+  y: number;
+}
+
 export function CisnetHeroAnimated() {
+  const [mousePos, setMousePos] = useState({ x: 300, y: 350 });
+  const [explosions, setExplosions] = useState<Explosion[]>([]);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const explosionIdRef = useRef(0);
+
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 600;
+    const y = ((e.clientY - rect.top) / rect.height) * 700;
+    setMousePos({ x, y });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<SVGSVGElement>) => {
+    if (!svgRef.current || e.touches.length === 0) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = ((touch.clientX - rect.left) / rect.width) * 600;
+    const y = ((touch.clientY - rect.top) / rect.height) * 700;
+    setMousePos({ x, y });
+  };
+
+  const createExplosion = (x: number, y: number) => {
+    const newExplosion = {
+      id: explosionIdRef.current++,
+      x,
+      y
+    };
+
+    setExplosions(prev => [...prev, newExplosion]);
+
+    // Remover explosión después de la animación
+    setTimeout(() => {
+      setExplosions(prev => prev.filter(exp => exp.id !== newExplosion.id));
+    }, 2000);
+  };
+
+  const handleClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 600;
+    const y = ((e.clientY - rect.top) / rect.height) * 700;
+    createExplosion(x, y);
+  };
+
+  const handleTouch = (e: React.TouchEvent<SVGSVGElement>) => {
+    if (!svgRef.current || e.touches.length === 0) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = ((touch.clientX - rect.left) / rect.width) * 600;
+    const y = ((touch.clientY - rect.top) / rect.height) * 700;
+    createExplosion(x, y);
+  };
+
   return (
     <div className="w-full h-full flex items-center justify-center">
       <style>{`
-        @keyframes orbitRings {
+        /* Fragmentación y reconstrucción - Efecto principal */
+        @keyframes fragmentAndRebuild {
           0% {
-            transform: rotate(0deg);
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            filter: blur(0px);
           }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes swanGlow {
-          0%, 100% {
+          15% {
             opacity: 0.8;
-            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.3));
+            transform: scale(1.05);
+          }
+          20% {
+            opacity: 0;
+            transform: scale(0.3) translateY(-100px);
+            filter: blur(20px);
           }
           50% {
+            opacity: 0;
+            transform: scale(0.1) translateY(-150px) rotate(180deg);
+            filter: blur(30px);
+          }
+          65% {
+            opacity: 0.3;
+            transform: scale(0.5) translateY(50px) rotate(0deg);
+            filter: blur(15px);
+          }
+          80% {
+            opacity: 0.7;
+            transform: scale(0.95) translateY(0);
+            filter: blur(5px);
+          }
+          100% {
             opacity: 1;
-            filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.5));
+            transform: scale(1) translateY(0);
+            filter: blur(0px);
           }
         }
 
+        /* Explosión de partículas */
+        @keyframes particleExplosion {
+          0% {
+            opacity: 0;
+            transform: translate(0, 0) scale(0);
+          }
+          20% {
+            opacity: 1;
+            transform: translate(var(--tx), var(--ty)) scale(1.5);
+          }
+          50% {
+            opacity: 0.8;
+            transform: translate(calc(var(--tx) * 2), calc(var(--ty) * 2)) scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(0, 0) scale(0.3);
+          }
+        }
+
+        /* Fragmentación de partes individuales */
+        @keyframes fragmentPart {
+          0%, 100% {
+            opacity: 1;
+            transform: translateX(0) translateY(0) rotate(0deg);
+          }
+          20% {
+            opacity: 0.5;
+            transform: translateX(var(--fx)) translateY(var(--fy)) rotate(var(--fr));
+          }
+          50% {
+            opacity: 0.2;
+            transform: translateX(calc(var(--fx) * 1.5)) translateY(calc(var(--fy) * 1.5)) rotate(calc(var(--fr) * 2));
+          }
+          80% {
+            opacity: 0.7;
+            transform: translateX(calc(var(--fx) * 0.3)) translateY(calc(var(--fy) * 0.3)) rotate(calc(var(--fr) * 0.5));
+          }
+        }
+
+        /* Anillos de energía explosiva */
+        @keyframes energyWave {
+          0% {
+            opacity: 0;
+            transform: scale(0.5);
+            stroke-width: 0;
+          }
+          30% {
+            opacity: 0.8;
+            stroke-width: 4;
+          }
+          60% {
+            opacity: 0.5;
+            transform: scale(2.5);
+            stroke-width: 2;
+          }
+          100% {
+            opacity: 0;
+            transform: scale(4);
+            stroke-width: 0;
+          }
+        }
+
+        /* Orbital rings */
+        @keyframes orbitSlow {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        @keyframes orbitReverse {
+          0% { transform: rotate(360deg); }
+          100% { transform: rotate(0deg); }
+        }
+
+        /* Eye glow */
         @keyframes eyeGlow {
           0%, 100% {
             opacity: 0.4;
-            r: 6px;
+            filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.5));
           }
           50% {
-            opacity: 1;
-            r: 8px;
+            opacity: 0.9;
+            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.8));
           }
         }
 
-        @keyframes floatSwan {
+        /* Pulse effect */
+        @keyframes pulse {
           0%, 100% {
-            transform: translateY(0px);
+            transform: scale(1);
+            opacity: 0.6;
           }
           50% {
-            transform: translateY(-8px);
+            transform: scale(1.3);
+            opacity: 1;
           }
         }
 
-        .cisnet-orbit-rings {
-          animation: orbitRings 25s linear infinite;
+        /* Light trail */
+        @keyframes lightTrail {
+          0% { opacity: 0; stroke-dashoffset: 0; }
+          30% { opacity: 0.8; }
+          60% { opacity: 0.6; stroke-dashoffset: -100; }
+          100% { opacity: 0; stroke-dashoffset: -200; }
+        }
+
+        /* Explosión interactiva al hacer click */
+        @keyframes clickExplosion {
+          0% {
+            opacity: 0;
+            transform: translate(0, 0) scale(0);
+          }
+          10% {
+            opacity: 1;
+          }
+          30% {
+            opacity: 0.8;
+            transform: translate(var(--tx), var(--ty)) scale(2);
+          }
+          60% {
+            opacity: 0.4;
+            transform: translate(calc(var(--tx) * 2.5), calc(var(--ty) * 2.5)) scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(calc(var(--tx) * 3), calc(var(--ty) * 3)) scale(0.5);
+          }
+        }
+
+        /* Onda expansiva del click */
+        @keyframes clickWave {
+          0% {
+            opacity: 0;
+            transform: scale(0);
+            stroke-width: 8;
+          }
+          20% {
+            opacity: 1;
+            stroke-width: 6;
+          }
+          50% {
+            opacity: 0.6;
+            transform: scale(3);
+            stroke-width: 3;
+          }
+          100% {
+            opacity: 0;
+            transform: scale(6);
+            stroke-width: 0;
+          }
+        }
+
+        /* Aplicar animaciones */
+        .swan-body {
+          animation: fragmentAndRebuild 12s ease-in-out infinite;
+        }
+
+        .body-part {
+          animation: fragmentPart 12s ease-in-out infinite;
+        }
+
+        .energy-wave {
+          animation: energyWave 12s ease-out infinite;
+        }
+
+        .explosion-particle {
+          animation: particleExplosion 12s ease-out infinite;
+        }
+
+        .orbit-ring-1 {
+          animation: orbitSlow 40s linear infinite;
           transform-origin: center;
         }
 
-        .cisnet-swan {
-          animation: swanGlow 4s ease-in-out infinite, floatSwan 6s ease-in-out infinite;
+        .orbit-ring-2 {
+          animation: orbitReverse 50s linear infinite;
+          transform-origin: center;
         }
 
-        .cisnet-eye-glow {
-          animation: eyeGlow 3s ease-in-out infinite;
+        .orbit-ring-3 {
+          animation: orbitSlow 60s linear infinite;
+          transform-origin: center;
+        }
+
+        #eye-glow {
+          animation: eyeGlow 5s ease-in-out infinite;
+        }
+
+        .light-trail {
+          animation: lightTrail 6s ease-in-out infinite;
+        }
+
+        .energy-particle {
+          animation: pulse 3s ease-in-out infinite;
+        }
+
+        .click-explosion-particle {
+          animation: clickExplosion 2s ease-out forwards;
+        }
+
+        .click-wave {
+          animation: clickWave 2s ease-out forwards;
+        }
+
+        /* Delays escalonados para partes */
+        #head { animation-delay: 0s; }
+        #neck { animation-delay: 0.1s; }
+        #body { animation-delay: 0.2s; }
+        #wing-left { animation-delay: 0.15s; }
+        #wing-right { animation-delay: 0.15s; }
+
+        /* Interactividad con cursor */
+        svg {
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        svg:hover .orbit-ring-1 {
+          animation-duration: 30s;
+          opacity: 0.8;
+        }
+
+        svg:hover .orbit-ring-2 {
+          animation-duration: 35s;
+          opacity: 0.7;
+        }
+
+        svg:hover .orbit-ring-3 {
+          animation-duration: 45s;
+          opacity: 0.5;
+        }
+
+        svg:hover .energy-particle {
+          animation-duration: 2s;
+          r: 4;
+        }
+
+        /* Optimizaciones para móvil */
+        @media (max-width: 1024px) {
+          svg {
+            max-width: 100%;
+            height: auto;
+          }
+
+          /* Reducir número de partículas en móvil para mejor rendimiento */
+          .explosion-particle:nth-child(n+9) {
+            display: none;
+          }
+
+          /* Animaciones más suaves en móvil */
+          .orbit-ring-1 {
+            animation-duration: 50s !important;
+          }
+
+          .orbit-ring-2 {
+            animation-duration: 60s !important;
+          }
+
+          .orbit-ring-3 {
+            animation-duration: 70s !important;
+          }
+
+          /* Ocultar indicador de cursor en móvil */
+          circle[opacity="0.4"] {
+            display: none;
+          }
+        }
+
+        /* Soporte táctil - efecto de toque */
+        @media (hover: none) and (pointer: coarse) {
+          svg {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+          }
         }
       `}</style>
 
-      {/* SVG Container */}
       <svg
-        viewBox="0 0 400 400"
-        className="w-72 h-72 md:w-96 md:h-96"
+        ref={svgRef}
+        viewBox="0 0 600 700"
+        className="w-full h-full max-w-3xl"
         xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="xMidYMid meet"
+        onMouseMove={handleMouseMove}
+        onClick={handleClick}
+        onTouchMove={handleTouchMove}
+        onTouchStart={handleTouch}
       >
-        {/* Defining gradients and filters */}
         <defs>
-          {/* Gradient para el cisne - cuerpo */}
-          <linearGradient id="swanGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#ffffff', stopOpacity: 0.95 }} />
-            <stop offset="50%" style={{ stopColor: '#f8fafc', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#f1f5f9', stopOpacity: 1 }} />
+          {/* Gradients */}
+          <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#dbeafe" />
+            <stop offset="25%" stopColor="#bfdbfe" />
+            <stop offset="60%" stopColor="#93c5fd" />
+            <stop offset="100%" stopColor="#60a5fa" />
           </linearGradient>
 
-          {/* Gradient para el cuello */}
-          <linearGradient id="neckGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#ffffff', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#f3f4f6', stopOpacity: 1 }} />
+          <linearGradient id="neckGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#f0f9ff" />
+            <stop offset="40%" stopColor="#e0f2fe" />
+            <stop offset="100%" stopColor="#bae6fd" />
           </linearGradient>
 
-          {/* Gradient para el ojo */}
-          <radialGradient id="eyeGlowGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" style={{ stopColor: '#22d3ee', stopOpacity: 1 }} />
-            <stop offset="70%" style={{ stopColor: '#06b6d4', stopOpacity: 0.6 }} />
-            <stop offset="100%" style={{ stopColor: '#0891b2', stopOpacity: 0.2 }} />
+          <linearGradient id="wingFeatherGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#1e3a8a" stopOpacity="0.95" />
+            <stop offset="40%" stopColor="#1e40af" stopOpacity="0.98" />
+            <stop offset="70%" stopColor="#2563eb" stopOpacity="1" />
+            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.95" />
+          </linearGradient>
+
+          <radialGradient id="eyeGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
+            <stop offset="35%" stopColor="#22d3ee" stopOpacity="0.95" />
+            <stop offset="75%" stopColor="#06b6d4" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#0891b2" stopOpacity="0.2" />
           </radialGradient>
 
-          {/* Filter para suavidad */}
-          <filter id="softGlow">
-            <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0" />
+            <stop offset="50%" stopColor="#22d3ee" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#22d3ee" stopOpacity="0" />
+          </linearGradient>
+
+          {/* Filters */}
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
             <feMerge>
               <feMergeNode in="coloredBlur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
 
-          {/* Shadow filter */}
-          <filter id="subtleShadow">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="2" />
-            <feOffset dx="0" dy="2" result="offsetblur" />
+          <filter id="shadow">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+            <feOffset dx="0" dy="5" result="offsetblur" />
             <feComponentTransfer>
-              <feFuncA type="linear" slope="0.15" />
+              <feFuncA type="linear" slope="0.3" />
             </feComponentTransfer>
             <feMerge>
-              <feMergeNode in="offsetblur" />
+              <feMergeNode />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+
+          <filter id="enhancedGlow">
+            <feGaussianBlur stdDeviation="6" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="coloredBlur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
         </defs>
 
-        {/* Background subtle vignette */}
-        <defs>
-          <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
-            <stop offset="0%" style={{ stopColor: '#ffffff', stopOpacity: 0 }} />
-            <stop offset="100%" style={{ stopColor: '#000000', stopOpacity: 0.05 }} />
-          </radialGradient>
-        </defs>
-        <rect width="400" height="400" fill="url(#vignette)" opacity="0.3" />
-
-        {/* Orbital energy rings - animated */}
-        <g className="cisnet-orbit-rings" opacity="0.65">
-          {/* Ring 1 - Inner - Cyan */}
+        {/* Ondas de energía explosiva */}
+        <g id="energy-waves">
           <circle
-            cx="200"
-            cy="200"
-            r="95"
+            className="energy-wave"
+            cx="300"
+            cy="350"
+            r="100"
             fill="none"
-            stroke="rgba(34, 211, 238, 0.35)"
+            stroke="#22d3ee"
+            strokeWidth="3"
+            opacity="0"
+          />
+          <circle
+            className="energy-wave"
+            cx="300"
+            cy="350"
+            r="100"
+            fill="none"
+            stroke="#06b6d4"
+            strokeWidth="2"
+            opacity="0"
+            style={{ animationDelay: '0.3s' }}
+          />
+          <circle
+            className="energy-wave"
+            cx="300"
+            cy="350"
+            r="100"
+            fill="none"
+            stroke="#0891b2"
             strokeWidth="1.5"
-            strokeDasharray="10 5"
-          />
-          {/* Ring 2 - Medium - Cyan darker */}
-          <circle
-            cx="200"
-            cy="200"
-            r="135"
-            fill="none"
-            stroke="rgba(6, 182, 212, 0.25)"
-            strokeWidth="1"
-            strokeDasharray="15 8"
-          />
-          {/* Ring 3 - Outer - Cyan subtle */}
-          <circle
-            cx="200"
-            cy="200"
-            r="170"
-            fill="none"
-            stroke="rgba(34, 211, 238, 0.15)"
-            strokeWidth="0.8"
-            strokeDasharray="12 10"
+            opacity="0"
+            style={{ animationDelay: '0.6s' }}
           />
         </g>
 
-        {/* Main swan group - with glow animation */}
-        <g className="cisnet-swan">
-          {/* Swan body - main ellipse */}
-          <ellipse
-            cx="200"
-            cy="240"
-            rx="72"
-            ry="82"
-            fill="url(#swanGradient)"
-            stroke="#d1d5db"
-            strokeWidth="1.2"
-            filter="url(#subtleShadow)"
-          />
-
-          {/* Body highlight - subtle shine */}
-          <ellipse
-            cx="180"
-            cy="210"
-            rx="45"
-            ry="50"
-            fill="#ffffff"
-            opacity="0.4"
-          />
-
-          {/* Swan neck - elegant S-curve */}
-          <path
-            d="M 200 158 Q 195 145, 195 120 Q 195 100, 200 80"
-            stroke="url(#neckGradient)"
-            strokeWidth="32"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            filter="url(#subtleShadow)"
-          />
-
-          {/* Neck right side shading */}
-          <path
-            d="M 200 158 Q 205 145, 205 120 Q 205 100, 200 80"
-            stroke="#e5e7eb"
-            strokeWidth="28"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.4"
-          />
-
-          {/* Swan head - elegant circle */}
-          <circle
-            cx="200"
-            cy="50"
-            r="25"
-            fill="url(#swanGradient)"
-            stroke="#d1d5db"
-            strokeWidth="1.2"
-            filter="url(#subtleShadow)"
-          />
-
-          {/* Head highlight */}
-          <circle
-            cx="190"
-            cy="42"
-            r="10"
-            fill="#ffffff"
-            opacity="0.5"
-          />
-
-          {/* Beak - elegant and tapered */}
-          <path
-            d="M 220 48 L 248 45 L 222 55 Z"
-            fill="#fbbf24"
-            stroke="#f59e0b"
-            strokeWidth="0.8"
-            strokeLinejoin="round"
-            filter="url(#subtleShadow)"
-          />
-
-          {/* Eye base - dark pupil */}
-          <circle
-            cx="212"
-            cy="46"
-            r="3.5"
-            fill="#1f2937"
-            opacity="0.9"
-          />
-
-          {/* Eye glow - blue soft pulse */}
-          <circle
-            cx="212"
-            cy="46"
-            r="6"
-            fill="url(#eyeGlowGradient)"
-            className="cisnet-eye-glow"
-            opacity="0.6"
-          />
-
-          {/* Eye shine */}
-          <circle
-            cx="213.5"
-            cy="44.5"
-            r="1.5"
-            fill="#ffffff"
-            opacity="0.8"
-          />
-
-          {/* Wing - right side - larger and elegant */}
-          <path
-            d="M 268 230 Q 305 215, 310 250 Q 305 275, 280 268 Q 270 265, 268 255 Z"
-            fill="#f9fafb"
-            stroke="#e5e7eb"
-            strokeWidth="1"
-            opacity="0.95"
-            filter="url(#subtleShadow)"
-          />
-
-          {/* Wing - right feather lines */}
-          <path
-            d="M 280 240 Q 295 232, 305 250"
-            stroke="#e5e7eb"
-            strokeWidth="0.8"
-            fill="none"
-            opacity="0.5"
-          />
-
-          {/* Wing - left side */}
-          <path
-            d="M 132 230 Q 95 215, 90 250 Q 95 275, 120 268 Q 130 265, 132 255 Z"
-            fill="#f9fafb"
-            stroke="#e5e7eb"
-            strokeWidth="1"
-            opacity="0.95"
-            filter="url(#subtleShadow)"
-          />
-
-          {/* Wing - left feather lines */}
-          <path
-            d="M 120 240 Q 105 232, 95 250"
-            stroke="#e5e7eb"
-            strokeWidth="0.8"
-            fill="none"
-            opacity="0.5"
-          />
-
-          {/* Tail feathers - graceful and flowing */}
-          <path
-            d="M 175 315 Q 160 345, 155 375"
-            stroke="#ffffff"
-            strokeWidth="9"
-            fill="none"
-            strokeLinecap="round"
-            opacity="0.85"
-            filter="url(#subtleShadow)"
-          />
-          <path
-            d="M 200 320 Q 200 355, 200 385"
-            stroke="#ffffff"
-            strokeWidth="10"
-            fill="none"
-            strokeLinecap="round"
-            opacity="0.9"
-            filter="url(#subtleShadow)"
-          />
-          <path
-            d="M 225 315 Q 240 345, 245 375"
-            stroke="#ffffff"
-            strokeWidth="9"
-            fill="none"
-            strokeLinecap="round"
-            opacity="0.85"
-            filter="url(#subtleShadow)"
-          />
-
-          {/* Tail shading - subtle depth */}
-          <path
-            d="M 200 320 L 200 380"
-            stroke="#e5e7eb"
-            strokeWidth="4"
-            fill="none"
-            strokeLinecap="round"
-            opacity="0.3"
-          />
+        {/* Partículas de explosión */}
+        <g id="explosion-particles">
+          {[...Array(16)].map((_, i) => {
+            const angle = (i * 360) / 16;
+            const tx = Math.cos((angle * Math.PI) / 180) * 150;
+            const ty = Math.sin((angle * Math.PI) / 180) * 150;
+            return (
+              <circle
+                key={i}
+                className="explosion-particle"
+                cx="300"
+                cy="350"
+                r="4"
+                fill="#22d3ee"
+                filter="url(#glow)"
+                style={{
+                  '--tx': `${tx}px`,
+                  '--ty': `${ty}px`,
+                  animationDelay: `${i * 0.05}s`
+                } as React.CSSProperties}
+              />
+            );
+          })}
         </g>
 
-        {/* Additional rotating light elements */}
-        <g className="cisnet-orbit-rings" opacity="0.4">
-          {/* Light accent 1 */}
-          <circle
-            cx="200"
-            cy="200"
-            r="110"
-            fill="none"
-            stroke="rgba(34, 211, 238, 0.25)"
-            strokeWidth="0.5"
-          />
-          {/* Light accent 2 */}
-          <circle
-            cx="200"
-            cy="200"
-            r="155"
-            fill="none"
-            stroke="rgba(6, 182, 212, 0.15)"
-            strokeWidth="0.5"
-          />
+        {/* Anillos orbitales */}
+        <g id="energy-rings">
+          <g className="orbit-ring-1" opacity="0.6">
+            <circle
+              cx="300"
+              cy="350"
+              r="160"
+              fill="none"
+              stroke="rgba(34, 211, 238, 0.4)"
+              strokeWidth="2.5"
+              strokeDasharray="25 18"
+              filter="url(#glow)"
+            />
+            <circle
+              cx="300"
+              cy="350"
+              r="160"
+              fill="none"
+              stroke="url(#ringGrad)"
+              strokeWidth="3"
+              strokeDasharray="70 330"
+              className="light-trail"
+            />
+          </g>
+
+          <g className="orbit-ring-2" opacity="0.5">
+            <circle
+              cx="300"
+              cy="350"
+              r="205"
+              fill="none"
+              stroke="rgba(6, 182, 212, 0.35)"
+              strokeWidth="2"
+              strokeDasharray="30 22"
+              filter="url(#glow)"
+            />
+          </g>
+
+          <g className="orbit-ring-3" opacity="0.35">
+            <circle
+              cx="300"
+              cy="350"
+              r="250"
+              fill="none"
+              stroke="rgba(34, 211, 238, 0.25)"
+              strokeWidth="1.5"
+              strokeDasharray="35 28"
+            />
+          </g>
         </g>
 
-        {/* Subtle particle effects - energy points */}
-        <g opacity="0.3" className="cisnet-orbit-rings">
-          <circle cx="320" cy="200" r="2" fill="rgba(34, 211, 238, 0.6)" />
-          <circle cx="80" cy="200" r="2" fill="rgba(34, 211, 238, 0.6)" />
-          <circle cx="200" cy="320" r="2" fill="rgba(34, 211, 238, 0.6)" />
-          <circle cx="200" cy="80" r="2" fill="rgba(34, 211, 238, 0.6)" />
+
+        {/* Partículas orbitales */}
+        <g id="orbital-particles">
+          {[...Array(8)].map((_, i) => {
+            const angle = (i * 360) / 8;
+            const x = 300 + Math.cos((angle * Math.PI) / 180) * 180;
+            const y = 350 + Math.sin((angle * Math.PI) / 180) * 180;
+            return (
+              <circle
+                key={i}
+                className="energy-particle"
+                cx={x}
+                cy={y}
+                r="3"
+                fill="#22d3ee"
+                filter="url(#glow)"
+                style={{ animationDelay: `${i * 0.375}s` }}
+              />
+            );
+          })}
         </g>
+
+        {/* Explosiones interactivas al hacer click */}
+        {explosions.map((explosion) => (
+          <g key={explosion.id}>
+            {/* Onda expansiva */}
+            <circle
+              className="click-wave"
+              cx={explosion.x}
+              cy={explosion.y}
+              r="20"
+              fill="none"
+              stroke="#22d3ee"
+              strokeWidth="4"
+              opacity="0"
+            />
+            <circle
+              className="click-wave"
+              cx={explosion.x}
+              cy={explosion.y}
+              r="20"
+              fill="none"
+              stroke="#06b6d4"
+              strokeWidth="3"
+              opacity="0"
+              style={{ animationDelay: '0.1s' }}
+            />
+
+            {/* Partículas explosivas */}
+            {[...Array(12)].map((_, i) => {
+              const angle = (i * 360) / 12;
+              const tx = Math.cos((angle * Math.PI) / 180) * 80;
+              const ty = Math.sin((angle * Math.PI) / 180) * 80;
+              return (
+                <circle
+                  key={i}
+                  className="click-explosion-particle"
+                  cx={explosion.x}
+                  cy={explosion.y}
+                  r="5"
+                  fill="#22d3ee"
+                  filter="url(#glow)"
+                  style={{
+                    '--tx': `${tx}px`,
+                    '--ty': `${ty}px`,
+                    animationDelay: `${i * 0.03}s`
+                  } as React.CSSProperties}
+                />
+              );
+            })}
+          </g>
+        ))}
+
+        {/* Indicador sutil del cursor (punto que sigue el mouse) */}
+        <circle
+          cx={mousePos.x}
+          cy={mousePos.y}
+          r="2"
+          fill="#22d3ee"
+          opacity="0.4"
+          filter="url(#glow)"
+          style={{
+            transition: 'cx 0.1s ease, cy 0.1s ease',
+            pointerEvents: 'none'
+          }}
+        />
       </svg>
     </div>
   );
