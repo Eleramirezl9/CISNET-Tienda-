@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { CisnetHeroAnimated } from '@/compartido/componentes/CisnetHeroAnimated';
 
 export default function HomePage() {
   const [loaded, setLoaded] = useState(false);
@@ -15,22 +16,14 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col bg-white">
       {/* Hero Section - Video Background */}
       <main className="flex-1">
-        <section className="relative min-h-screen flex items-center overflow-hidden">
-          {/* Video Background */}
-          <div className="absolute inset-0 z-0">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute w-full h-full object-cover"
-            >
-              <source src="/hero-cisnet.mp4" type="video/mp4" />
-            </video>
-            {/* Overlay gradiente */}
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-slate-900/40" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-slate-900/30" />
+        <section className="relative min-h-screen flex items-center overflow-hidden bg-linear-to-br from-slate-900 via-slate-800 to-slate-900">
+          {/* SVG Animated Background */}
+          <div className="absolute inset-0 z-0 opacity-40">
+            <CisnetHeroAnimated />
           </div>
+          {/* Overlay gradiente para elegancia */}
+          <div className="absolute inset-0 bg-linear-to-r from-slate-900/85 via-slate-900/70 to-slate-900/50 z-5" />
+          <div className="absolute inset-0 bg-linear-to-t from-slate-900/70 via-transparent to-slate-900/40 z-5" />
 
           {/* Contenido */}
           <div className="relative z-10 max-w-7xl mx-auto px-8 py-32 w-full">
@@ -46,7 +39,7 @@ export default function HomePage() {
                 {/* Título */}
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 tracking-tight">
                   Transformamos
-                  <span className="block bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                  <span className="block bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                     Tu Negocio Digital
                   </span>
                 </h1>
@@ -99,7 +92,7 @@ export default function HomePage() {
               <div className={`hidden lg:flex justify-center items-center transition-all duration-1000 delay-300 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
                 <div className="relative">
                   {/* Glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/30 to-blue-500/30 rounded-full blur-3xl scale-110" />
+                  <div className="absolute inset-0 bg-linear-to-br from-cyan-400/30 to-blue-500/30 rounded-full blur-3xl scale-110" />
                   <Image
                     src="/mascota-cisnet.png"
                     alt="Cisney - Mascota de CISNET"

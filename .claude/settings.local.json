@@ -17,7 +17,8 @@
       "Bash(pnpm add:*)",
       "Bash(npx prisma:*)",
       "Bash(npx tsc:*)",
-      "Bash(pnpm list:*)"
+      "Bash(pnpm list:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
